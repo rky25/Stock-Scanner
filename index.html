@@ -5,7 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stock Scanner</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+    <!-- Primary CDN for Lightweight Charts -->
+    <script src="https://unpkg.com/lightweight-charts@4.0.0/dist/lightweight-charts.standalone.production.js"></script>
+    <!-- Fallback CDN -->
+    <script>
+        if (typeof LightweightCharts === 'undefined') {
+            var script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/lightweight-charts@4.0.0/dist/lightweight-charts.standalone.production.js';
+            document.head.appendChild(script);
+        }
+    </script>
     <style>
         :root { 
             --bg-base: #0b0f19; --card-bg: rgba(22, 27, 34, 0.55); --card-border: rgba(255, 255, 255, 0.08); 
@@ -595,7 +604,14 @@
         try {
             const container = document.getElementById('chartContainer');
             if(!container) throw new Error("Chart container not found in DOM");
-            if(typeof LightweightCharts === 'undefined') throw new Error("Chart library is still loading or blocked by network.");
+            
+            // Check if library exists and has required method
+            if(typeof LightweightCharts === 'undefined') {
+                throw new Error("Chart library failed to load from CDN. Retrying...");
+            }
+            if(typeof LightweightCharts.createChart !== 'function') {
+                throw new Error("LightweightCharts API mismatch - createChart not available");
+            }
             
             container.innerHTML = '';
             
@@ -608,6 +624,14 @@
                 rightPriceScale: { borderColor: 'rgba(255, 255, 255, 0.1)' },
                 timeScale: { borderColor: 'rgba(255, 255, 255, 0.1)', timeVisible: true }
             });
+            
+            // Verify chart object has required methods before calling them
+            if(typeof tvChart.addLineSeries !== 'function') {
+                throw new Error("Chart object missing addLineSeries method - library version may be incompatible");
+            }
+            if(typeof tvChart.addCandlestickSeries !== 'function') {
+                throw new Error("Chart object missing addCandlestickSeries method - library version incompatible");
+            }
             
             upperSeries = tvChart.addLineSeries({ color: 'rgba(255, 255, 255, 0.1)', lineWidth: 1 });
             lowerSeries = tvChart.addLineSeries({ color: 'rgba(255, 255, 255, 0.1)', lineWidth: 1 });
@@ -628,6 +652,10 @@
         } catch(e) {
             tvChart = null;
             candleSeries = null;
+            line1Series = null;
+            line2Series = null;
+            upperSeries = null;
+            lowerSeries = null;
             throw new Error(`Chart Engine Issue: ${e.message}`);
         }
     }
