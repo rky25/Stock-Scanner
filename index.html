@@ -585,6 +585,67 @@
 
         /* Prevent text selection on interactive elements */
         button, .q-btn, .port-item, .ind-cell { -webkit-user-select: none; user-select: none; }
+
+        /* ============================================
+           MARKET LEADERS (200-500)
+        ============================================ */
+        .leaders-wrap {
+            margin-bottom: 20px;
+            animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+        }
+        .leaders-head {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 10px; padding: 0 4px;
+        }
+        .leaders-title {
+            font-size: 12px; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 0.5px; color: var(--text-dim); display: flex; align-items: center; gap: 6px;
+        }
+        .leaders-scan-status {
+            font-size: 10px; background: rgba(99,102,241,0.1); color: var(--blue);
+            padding: 3px 8px; border-radius: 20px; font-weight: 700;
+        }
+        .leaders-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+        }
+        @media (max-width: 420px) { .leaders-grid { grid-template-columns: 1fr; } }
+        .leader-col {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); overflow: hidden;
+        }
+        .leader-col-title {
+            font-size: 11px; font-weight: 800; text-align: center; padding: 8px;
+            border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .leader-up-title { background: var(--green-bg); color: var(--green); border-bottom-color: var(--green-border); }
+        .leader-down-title { background: var(--red-bg); color: var(--red); border-bottom-color: var(--red-border); }
+        .leader-list { list-style: none; }
+        .leader-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.03);
+            cursor: pointer; transition: background 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .leader-item:last-child { border-bottom: none; }
+        .leader-item:hover { background: rgba(255,255,255,0.02); }
+        .leader-item:active { transform: scale(0.98); }
+        .leader-sym { font-size: 13px; font-weight: 800; color: var(--text-bright); margin-bottom: 2px;}
+        .leader-action { font-size: 9px; color: var(--text-dim); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+        .leader-metrics { text-align: right; }
+        .leader-price { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+        .leader-pct { font-size: 11px; font-weight: 800; font-variant-numeric: tabular-nums; display: flex; align-items: center; justify-content: flex-end; gap: 2px; }
+        .leader-pct.up { color: var(--green); }
+        .leader-pct.down { color: var(--red); }
+        
+        .scan-progress {
+            height: 3px; width: 100%; background: rgba(255,255,255,0.05); margin-bottom: 14px;
+            border-radius: 3px; overflow: hidden; display: none; position: relative;
+        }
+        .scan-progress-bar {
+            height: 100%; width: 0%; background: linear-gradient(90deg, var(--blue), var(--purple));
+            transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .leader-empty { padding: 20px; text-align: center; font-size: 11px; color: var(--text-dim); }
     </style>
 </head>
 <body>
@@ -617,6 +678,30 @@
     </div>
 
     <div class="mkt-status" id="marketStatus"></div>
+
+    <!-- ==================== MARKET LEADERS (200-500) ==================== -->
+    <div class="leaders-wrap" id="leadersSection">
+        <div class="leaders-head">
+            <div class="leaders-title">⚡ Momentum Leaders <span style="opacity:0.6;font-size:10px;">(₹200 - ₹500)</span></div>
+            <div class="leaders-scan-status" id="leadersStatus">Scanning...</div>
+        </div>
+        <div class="scan-progress" id="scanProgressCont"><div class="scan-progress-bar" id="scanProgressBar"></div></div>
+        
+        <div class="leaders-grid">
+            <div class="leader-col">
+                <div class="leader-col-title leader-up-title">🚀 Top Gainers</div>
+                <ul class="leader-list" id="listBullish">
+                    <div class="leader-empty">Awaiting Scan...</div>
+                </ul>
+            </div>
+            <div class="leader-col">
+                <div class="leader-col-title leader-down-title">📉 Top Losers</div>
+                <ul class="leader-list" id="listBearish">
+                    <div class="leader-empty">Awaiting Scan...</div>
+                </ul>
+            </div>
+        </div>
+    </div>
 
     <div class="loader" id="loader">
         <div class="spinner-wrap"><div class="spinner-ring"></div><div class="spinner-dot"></div></div>
@@ -1114,6 +1199,119 @@ setInterval(async()=>{for(const s of portfolio){try{const o=await getAlgorithmDa
 setInterval(async()=>{if(activeSymbol&&DOM.resultCard.style.display!=='none'){document.getElementById('rTime').innerText='Refreshing...';try{const o=await getAlgorithmData(activeSymbol);renderMainCard(o,true);}catch(e){}}},30000);
 
 if(portfolio.size>0){DOM.portSection.style.display='block';portfolio.forEach(sym=>renderPortfolioCard({sym,ltp:'...',signalType:'SYNC',grade:'--',pChange:0,change:0,conf:0}));setTimeout(async()=>{for(const sym of portfolio){try{const o=await getAlgorithmData(sym);renderPortfolioCard(o);portfolioSignals[sym]=o.signalType;}catch(e){}}},2000);}
+// ==============================
+// MARKET LEADERS SCANNER (200-500)
+// ==============================
+const SCANNER_POOL = [
+    "RELIANCE","TCS","INFY","HDFCBANK","ICICIBANK","SBIN","TATAMOTORS","ITC","LARSEN","BAJFINANCE","BHARTIARTL",
+    "AXISBANK","KOTAKBANK","ASIANPAINT","M&M","HCLTECH","SUNPHARMA","TITAN","WIPRO","NTPC","POWERGRID","JSWSTEEL",
+    "TATASTEEL","ADANIPORTS","HINDALCO","ONGC","COALINDIA","GRASIM","TECHM","CIPLA","HINDUNILVR","DRREDDY",
+    "MARUTI","ULTRACEMCO","BAJAJFINSV","NESTLEIND","EICHERMOT","BPCL","HEROMOTOCO","DIVISLAB","TATAASIA",
+    "PVRINOX","BHEL","BEL","HAL","RVNL","IRFC","JIOFIN","SUZLON","ZOMATO","PAYTM","NYKAA",
+    "AWL","ADANIENT","ADANIGREEN","TATAPOWER","INDIGO","IOC","NMDC","SAIL","PNB","BANKBARODA",
+    "CANBK","UNIONBANK","INDIANB","IDFCFIRSTB","YESBANK","RECLTD","PFC","GAIL","HINDPETRO","AMBUJACEM",
+    "ACC","SHREECEM","VEDL","BOSCHLTD","MRF","APOLLOHOSP","TORNTPHARM","BIOCON","LUPIN","AUROPHARMA",
+    "PEL","MOTHERSON","TVSMOTOR","ASHOKLEY","ESCORTS","MCDOWELL-N","UBL","IGL","MGL","PETRONET",
+    "CONCOR","IRCTC","HAVELLS","VOLTAS","DIXON","POLYCAB","KEI","ASTRAL","BATAINDIA","CUMMINSIND",
+    "LTTS","LTIM","PERSISTENT","MPHASIS","COFORGE","BSOFT","TATACOMM","NAUKRI","ICICIGI","HDFCLIFE",
+    "SBILIFE","MAXHEALTH","SYNGENE","CROMPTON","PAGEIND","SRF","NAVINFLUOR","DEEPAKNTR","PIIND",
+    "TRENT","JINDALSTEL","MUTHOOTFIN","CHOLAFIN","SRTRANSFIN","M&MFIN","MANAPPURAM","LICI","ABBOTINDIA",
+    "GMRINFRA","TRIDENT","IDEA","YESBANK","IDBI","BANKINDIA","CENTRALBK","UCOBANK","IOB","MAHABANK",
+    "IRB","SUNDARMFIN","PNBHOUSING","LICHSGFIN","CANFINHOME","ABCAPITAL","ABFRL","ZEEL","SUNTV","PVRINOX"
+];
+
+async function scanMarketLeaders() {
+    const listBullish = document.getElementById('listBullish');
+    const listBearish = document.getElementById('listBearish');
+    const statusText = document.getElementById('leadersStatus');
+    const progCont = document.getElementById('scanProgressCont');
+    const progBar = document.getElementById('scanProgressBar');
+    
+    progCont.style.display = 'block';
+    
+    const BATCH_SIZE = 40;
+    const allValidStocks = [];
+    
+    for (let i = 0; i < SCANNER_POOL.length; i += BATCH_SIZE) {
+        const chunk = SCANNER_POOL.slice(i, i + BATCH_SIZE);
+        const syms = chunk.map(s => s + '.NS').join(',');
+        const url = `https://query2.finance.yahoo.com/v7/finance/quote?symbols=${syms}`;
+        
+        try {
+            const proxies = [
+                `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
+                `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+                `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+                url
+            ];
+            
+            let data = null;
+            for (const p of proxies) {
+                try {
+                    const res = await fetch(p, { signal: AbortSignal.timeout(5000) });
+                    if (res.ok) {
+                        const json = await res.json();
+                        if (json?.quoteResponse?.result) {
+                            data = json.quoteResponse.result;
+                            break;
+                        }
+                    }
+                } catch(e) {}
+            }
+            
+            if (data) {
+                data.forEach(q => {
+                    const p = q.regularMarketPrice;
+                    const pct = q.regularMarketChangePercent || 0;
+                    if (p >= 200 && p <= 500) {
+                        allValidStocks.push({ sym: q.symbol, price: p, pct });
+                    }
+                });
+            }
+        } catch(e) { console.error('Batch error', e); }
+        
+        progBar.style.width = Math.round(((i + BATCH_SIZE) / SCANNER_POOL.length) * 100) + '%';
+    }
+    
+    progCont.style.display = 'none';
+    
+    if (allValidStocks.length === 0) {
+        listBullish.innerHTML = '<div class="leader-empty">No stocks found in range</div>';
+        listBearish.innerHTML = '<div class="leader-empty">No stocks found in range</div>';
+        statusText.innerText = 'Failed';
+        return;
+    }
+    
+    // Sort by Momentum (% Change)
+    allValidStocks.sort((a,b) => b.pct - a.pct);
+    
+    const topGainers = allValidStocks.slice(0, 5);
+    const topLosers = allValidStocks.slice(-5).reverse();
+    
+    const renderItem = (item, isUp) => `
+        <li class="leader-item" onclick="DOM.symbolInput.value='${item.sym.replace('.NS','')}'; analyzeInput();">
+            <div>
+                <div class="leader-sym">${item.sym.replace('.NS','')}</div>
+                <div class="leader-action">${isUp ? 'Strong Buy Candidate' : 'Strong Sell Candidate'}</div>
+            </div>
+            <div class="leader-metrics">
+                <div class="leader-price">${fmt(item.price)}</div>
+                <div class="leader-pct ${isUp ? 'up' : 'down'}">${isUp ? '▲' : '▼'} ${Math.abs(item.pct).toFixed(2)}%</div>
+            </div>
+        </li>
+    `;
+    
+    listBullish.innerHTML = topGainers.map(item => renderItem(item, true)).join('');
+    listBearish.innerHTML = topLosers.map(item => renderItem(item, false)).join('');
+    
+    statusText.innerText = `Checked ${SCANNER_POOL.length} stocks`;
+    statusText.style.background = 'rgba(52,211,153,0.1)';
+    statusText.style.color = 'var(--green)';
+}
+
+// Start Scanner on load
+setTimeout(scanMarketLeaders, 1000);
+
 </script>
 </body>
 </html>
