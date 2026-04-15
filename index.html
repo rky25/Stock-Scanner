@@ -683,7 +683,10 @@
     <div class="leaders-wrap" id="leadersSection">
         <div class="leaders-head">
             <div class="leaders-title">⚡ Momentum Leaders <span style="opacity:0.6;font-size:10px;">(₹200 - ₹500)</span></div>
-            <div class="leaders-scan-status" id="leadersStatus">Scanning...</div>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <div class="leaders-scan-status" id="leadersStatus">Scanning...</div>
+                <button onclick="scanMarketLeaders()" style="background:none;border:none;cursor:pointer;color:var(--text-dim);font-size:14px;padding:2px;" title="Refresh Scanner">🔄</button>
+            </div>
         </div>
         <div class="scan-progress" id="scanProgressCont"><div class="scan-progress-bar" id="scanProgressBar"></div></div>
         
@@ -1235,7 +1238,7 @@ async function scanMarketLeaders() {
     for (let i = 0; i < SCANNER_POOL.length; i += BATCH_SIZE) {
         const chunk = SCANNER_POOL.slice(i, i + BATCH_SIZE);
         const syms = chunk.map(s => s + '.NS').join(',');
-        const url = `https://query2.finance.yahoo.com/v7/finance/quote?symbols=${syms}`;
+        const url = `https://query1.finance.yahoo.com/v8/finance/spark?symbols=${syms}&range=1d&interval=1d`;
         
         try {
             const proxies = [
@@ -1251,8 +1254,9 @@ async function scanMarketLeaders() {
                     const res = await fetch(p, { signal: AbortSignal.timeout(5000) });
                     if (res.ok) {
                         const json = await res.json();
-                        if (json?.quoteResponse?.result) {
-                            data = json.quoteResponse.result;
+                        const firstSym = chunk[0] + '.NS';
+                        if (json && json[firstSym]) {
+                            data = json;
                             break;
                         }
                     }
@@ -1260,11 +1264,15 @@ async function scanMarketLeaders() {
             }
             
             if (data) {
-                data.forEach(q => {
-                    const p = q.regularMarketPrice;
-                    const pct = q.regularMarketChangePercent || 0;
-                    if (p >= 200 && p <= 500) {
-                        allValidStocks.push({ sym: q.symbol, price: p, pct });
+                Object.keys(data).forEach(sym => {
+                    const obj = data[sym];
+                    if (obj && obj.close && obj.close.length > 0) {
+                        const p = obj.close[obj.close.length - 1];
+                        const prev = obj.chartPreviousClose || p;
+                        const pct = prev > 0 ? ((p - prev) / prev) * 100 : 0;
+                        if (p >= 200 && p <= 500) {
+                            allValidStocks.push({ sym: obj.symbol || sym, price: p, pct });
+                        }
                     }
                 });
             }
@@ -1309,8 +1317,9 @@ async function scanMarketLeaders() {
     statusText.style.color = 'var(--green)';
 }
 
-// Start Scanner on load
+// Start Scanner on load and auto-refresh every 5 minutes (300000ms)
 setTimeout(scanMarketLeaders, 1000);
+setInterval(scanMarketLeaders, 300000);
 
 </script>
 </body>
