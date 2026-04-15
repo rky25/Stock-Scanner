@@ -646,6 +646,143 @@
             transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .leader-empty { padding: 20px; text-align: center; font-size: 11px; color: var(--text-dim); }
+
+        /* ============================================
+           AI MODULE: REGIME BADGE
+        ============================================ */
+        .regime-badge-wrap {
+            display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+            animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.08s both;
+        }
+        .regime-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .regime-trending { background: rgba(52,211,153,0.1); color: var(--green); border: 1px solid var(--green-border); }
+        .regime-ranging { background: rgba(251,191,36,0.1); color: var(--amber); border: 1px solid var(--amber-border); }
+        .regime-volatile { background: rgba(248,113,113,0.1); color: var(--red); border: 1px solid var(--red-border); }
+        .regime-desc { font-size: 10px; color: var(--text-dim); font-weight: 500; }
+
+        /* ============================================
+           AI MODULE: SESSION INTELLIGENCE BAR
+        ============================================ */
+        .session-bar {
+            display: flex; align-items: center; gap: 8px; padding: 8px 14px;
+            border-radius: var(--radius-sm); margin-bottom: 10px;
+            background: var(--surface); border: 1px solid var(--border);
+            animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+        }
+        .session-icon { font-size: 14px; }
+        .session-name { font-size: 11px; font-weight: 800; color: var(--text-bright); text-transform: uppercase; letter-spacing: 0.5px; }
+        .session-quality {
+            margin-left: auto; font-size: 10px; font-weight: 800; padding: 3px 10px;
+            border-radius: 12px; letter-spacing: 0.3px;
+        }
+        .sq-excellent { background: rgba(52,211,153,0.15); color: var(--green); }
+        .sq-good { background: rgba(129,140,248,0.15); color: var(--blue); }
+        .sq-poor { background: rgba(251,191,36,0.15); color: var(--amber); }
+        .sq-avoid { background: rgba(248,113,113,0.15); color: var(--red); }
+        .session-strategy { font-size: 10px; color: var(--text-dim); font-weight: 500; flex: 1; }
+
+        /* ============================================
+           AI MODULE: TRADE MANAGER PANEL
+        ============================================ */
+        .trade-manager {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 16px; margin-bottom: 10px;
+            animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both;
+            position: relative; overflow: hidden;
+        }
+        .trade-manager.tm-active { border-color: rgba(52,211,153,0.3); }
+        .trade-manager.tm-inactive { border-color: var(--border); }
+        .tm-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .tm-status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+        .tm-status-active { background: var(--green); animation: pulse 2s infinite; box-shadow: 0 0 8px rgba(52,211,153,0.4); }
+        .tm-status-idle { background: var(--text-dim); }
+        .tm-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); }
+        .tm-pnl { font-size: 18px; font-weight: 900; font-variant-numeric: tabular-nums; }
+        .tm-stages { display: flex; gap: 6px; margin-bottom: 10px; }
+        .tm-stage {
+            flex: 1; padding: 8px; border-radius: var(--radius-xs);
+            text-align: center; font-size: 10px; font-weight: 700;
+            border: 1px solid var(--border); background: rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+        .tm-stage.completed { background: rgba(52,211,153,0.1); border-color: var(--green-border); color: var(--green); }
+        .tm-stage.active { background: rgba(129,140,248,0.1); border-color: var(--blue-border); color: var(--blue); animation: glow-pulse 2s infinite; }
+        .tm-stage.pending { opacity: 0.4; }
+        .tm-stage-label { display: block; font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+        .tm-trail-indicator {
+            display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+            border-radius: var(--radius-xs); background: rgba(251,191,36,0.05);
+            border: 1px solid rgba(251,191,36,0.15); margin-top: 8px;
+        }
+        .tm-trail-label { font-size: 10px; color: var(--amber); font-weight: 700; }
+        .tm-trail-value { font-size: 12px; font-weight: 900; color: var(--amber); margin-left: auto; font-variant-numeric: tabular-nums; }
+        .tm-time-in-trade { font-size: 10px; color: var(--text-dim); font-weight: 600; margin-top: 6px; }
+        .tm-smart-exit {
+            margin-top: 8px; padding: 8px 12px; border-radius: var(--radius-xs);
+            font-size: 11px; font-weight: 700;
+        }
+        .tm-exit-warn { background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.2); color: var(--red); }
+        .tm-exit-ok { background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.2); color: var(--green); }
+
+        /* ============================================
+           AI MODULE: CONFIDENCE DONUT
+        ============================================ */
+        .confidence-donut-wrap {
+            display: flex; align-items: center; gap: 16px; padding: 16px;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); margin-bottom: 10px;
+            animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.14s both;
+        }
+        .donut-svg { width: 80px; height: 80px; flex-shrink: 0; transform: rotate(-90deg); }
+        .donut-ring { fill: none; stroke: rgba(255,255,255,0.04); stroke-width: 6; }
+        .donut-seg { fill: none; stroke-width: 6; stroke-linecap: round; transition: stroke-dasharray 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .donut-center { position: absolute; font-size: 16px; font-weight: 900; }
+        .donut-legend { display: flex; flex-direction: column; gap: 5px; flex: 1; }
+        .donut-leg-item { display: flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 600; color: var(--text-dim); }
+        .donut-leg-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .donut-leg-val { margin-left: auto; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; }
+
+        /* ============================================
+           AI MODULE: SIGNAL HISTORY LOG
+        ============================================ */
+        .signal-history {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 16px; margin-bottom: 10px;
+            animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.16s both;
+        }
+        .sh-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .sh-accuracy {
+            font-size: 10px; font-weight: 800; padding: 3px 10px;
+            border-radius: 12px;
+        }
+        .sh-list { display: flex; flex-direction: column; gap: 4px; max-height: 160px; overflow-y: auto; }
+        .sh-item {
+            display: flex; align-items: center; gap: 8px; padding: 6px 10px;
+            border-radius: var(--radius-xs); background: rgba(0,0,0,0.2);
+            font-size: 10px; font-weight: 600;
+        }
+        .sh-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+        .sh-dot.win { background: var(--green); box-shadow: 0 0 6px rgba(52,211,153,0.4); }
+        .sh-dot.loss { background: var(--red); box-shadow: 0 0 6px rgba(248,113,113,0.4); }
+        .sh-dot.pending { background: var(--amber); }
+        .sh-sym { color: var(--text-bright); font-weight: 800; min-width: 55px; }
+        .sh-sig { font-weight: 800; min-width: 30px; }
+        .sh-time { color: var(--text-dim); margin-left: auto; font-size: 9px; }
+        .sh-pnl { font-weight: 800; min-width: 50px; text-align: right; font-variant-numeric: tabular-nums; }
+
+        /* ============================================
+           AI MODULE: ADAPTIVE WEIGHTS INDICATOR
+        ============================================ */
+        .adaptive-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 9px; font-weight: 700; padding: 2px 8px;
+            border-radius: 10px; background: rgba(192,132,252,0.1);
+            color: var(--purple); border: 1px solid rgba(192,132,252,0.2);
+        }
     </style>
 </head>
 <body>
@@ -656,7 +793,7 @@
             <div class="logo-icon">📈</div>
             <h1>ProScanner</h1>
         </div>
-        <div class="subtitle">17-Indicator Intraday Intelligence</div>
+        <div class="subtitle">AI-Powered Smart Trading Intelligence</div>
     </header>
 
     <div id="errorToast" class="error-toast"></div>
@@ -739,6 +876,47 @@
             <div class="sig-right" id="rConfidence"></div>
         </div>
 
+        <!-- AI: Regime Badge + Session Bar -->
+        <div class="regime-badge-wrap" id="regimeBadgeWrap" style="display:none;">
+            <span class="regime-badge" id="regimeBadge">● TRENDING</span>
+            <span class="regime-desc" id="regimeDesc">Strong directional move</span>
+        </div>
+        <div class="session-bar" id="sessionBar" style="display:none;">
+            <span class="session-icon" id="sessionIcon">🌅</span>
+            <span class="session-name" id="sessionName">Opening</span>
+            <span class="session-strategy" id="sessionStrategy">Wait for setup</span>
+            <span class="session-quality" id="sessionQuality">GOOD</span>
+        </div>
+
+        <!-- AI: Trade Manager Panel -->
+        <div class="trade-manager tm-inactive" id="tradeManager" style="display:none;">
+            <div class="tm-header">
+                <div><span class="tm-status-dot tm-status-idle" id="tmStatusDot"></span><span class="tm-title" id="tmTitle">📋 Trade Manager</span></div>
+                <div class="tm-pnl" id="tmPnl">--</div>
+            </div>
+            <div class="tm-stages" id="tmStages">
+                <div class="tm-stage pending" id="tmStage1"><div>T1</div><span class="tm-stage-label">50%</span></div>
+                <div class="tm-stage pending" id="tmStage2"><div>T2</div><span class="tm-stage-label">30%</span></div>
+                <div class="tm-stage pending" id="tmStage3"><div>T3</div><span class="tm-stage-label">20%</span></div>
+            </div>
+            <div id="tmTrailWrap"></div>
+            <div id="tmSmartExit"></div>
+            <div class="tm-time-in-trade" id="tmTimeInTrade"></div>
+        </div>
+
+        <!-- AI: Confidence Donut -->
+        <div class="confidence-donut-wrap" id="confidenceDonut" style="display:none;">
+            <div style="position:relative;display:flex;align-items:center;justify-content:center;">
+                <svg class="donut-svg" viewBox="0 0 42 42">
+                    <circle class="donut-ring" cx="21" cy="21" r="16"></circle>
+                    <circle class="donut-seg" id="donutBull" cx="21" cy="21" r="16" stroke="var(--green)" stroke-dasharray="0 100.5"></circle>
+                    <circle class="donut-seg" id="donutBear" cx="21" cy="21" r="16" stroke="var(--red)" stroke-dasharray="0 100.5"></circle>
+                    <circle class="donut-seg" id="donutNeut" cx="21" cy="21" r="16" stroke="var(--amber)" stroke-dasharray="0 100.5"></circle>
+                </svg>
+            </div>
+            <div class="donut-legend" id="donutLegend"></div>
+        </div>
+
         <!-- Momentum Gauge -->
         <div class="section-card animate-fade-up stagger-1">
             <div class="gauge-wrap">
@@ -806,6 +984,15 @@
         <div class="summary-box animate-fade-up stagger-8">
             <strong style="display:flex;align-items:center;gap:6px;margin-bottom:5px;font-size:12px;">💡 Analysis Summary</strong>
             <span id="rAnalysisText"></span>
+        </div>
+
+        <!-- AI: Signal History Log -->
+        <div class="signal-history" id="signalHistory" style="display:none;">
+            <div class="sh-header">
+                <div class="section-title" style="margin-bottom:0;"><span class="emoji">📜</span> Signal History</div>
+                <span class="sh-accuracy" id="shAccuracy">--</span>
+            </div>
+            <div class="sh-list" id="shList"></div>
         </div>
     </div>
 
@@ -969,7 +1156,373 @@ else if(sig==='SELL'){const rL=Math.min(...lows.slice(-10)),mp=((entry-rL)/entry
 else{ts=null;}return{trailingStop:ts,tightened:tight};}
 
 // ==============================
-// CORE ALGORITHM
+// AI MODULE 1: ADAPTIVE WEIGHT LEARNING
+// ==============================
+const AdaptiveWeights = {
+    defaultWeights: { ema:10, rsi:15, macd:12, vwap:12, adx:8, supertrend:15, stochRsi:12, roc:8, williamsR:10, psar:10, obv:8, mfi:8, bbands:8, heikinAshi:10, rsiDiv:15, volSpike:10, mtf:18 },
+    getWeights(sym) {
+        try {
+            const stored = JSON.parse(localStorage.getItem('aiWeights_'+sym));
+            if(stored && stored.weights) return stored.weights;
+        } catch(e) {}
+        return {...this.defaultWeights};
+    },
+    saveWeights(sym, weights, accuracy) {
+        try {
+            localStorage.setItem('aiWeights_'+sym, JSON.stringify({weights, accuracy, updated: Date.now()}));
+        } catch(e) {}
+    },
+    learn(sym, indicatorResults, actualOutcome) {
+        // actualOutcome: 'correct' or 'incorrect' based on whether price moved in signal direction
+        const weights = this.getWeights(sym);
+        const lr = 0.15; // learning rate
+        Object.entries(indicatorResults).forEach(([key, val]) => {
+            if(!weights[key]) weights[key] = 10;
+            if(actualOutcome === 'correct') {
+                if(val.signal !== 'NEUTRAL') weights[key] = Math.min(25, weights[key] + lr * weights[key]);
+            } else {
+                if(val.signal !== 'NEUTRAL') weights[key] = Math.max(3, weights[key] - lr * weights[key]);
+            }
+        });
+        // Normalize so total = ~170 (same scale as default)
+        const total = Object.values(weights).reduce((a,b)=>a+b, 0);
+        const target = Object.values(this.defaultWeights).reduce((a,b)=>a+b, 0);
+        const factor = target / total;
+        Object.keys(weights).forEach(k => weights[k] = Math.round(weights[k] * factor * 10) / 10);
+        this.saveWeights(sym, weights, null);
+        return weights;
+    },
+    applyWeights(indicatorResults, weights) {
+        let weightedScore = 0;
+        Object.entries(indicatorResults).forEach(([key, val]) => {
+            const w = weights[key] || 10;
+            const baseW = this.defaultWeights[key] || 10;
+            const scale = w / baseW;
+            const adjustedScore = (val.score || 0) * scale;
+            weightedScore += adjustedScore;
+            val.adaptedWeight = w;
+            val.adaptedScore = adjustedScore;
+        });
+        return weightedScore;
+    },
+    autoLearn(sym, indicatorResults, closes) {
+        // Auto-learn from recent price action: check if last 5 candle direction matches indicator predictions
+        const n = closes.length;
+        if(n < 10) return this.getWeights(sym);
+        const recentMove = (closes[n-1] - closes[n-5]) / closes[n-5] * 100;
+        const bullInd = Object.values(indicatorResults).filter(v => v.signal === 'BUY').length;
+        const bearInd = Object.values(indicatorResults).filter(v => v.signal === 'SELL').length;
+        const majorityBull = bullInd > bearInd;
+        const priceUp = recentMove > 0.1;
+        const outcome = (majorityBull && priceUp) || (!majorityBull && !priceUp) ? 'correct' : 'incorrect';
+        return this.learn(sym, indicatorResults, outcome);
+    }
+};
+
+// ==============================
+// AI MODULE 2: MULTI-STAGE PROFIT BOOKING ENGINE
+// ==============================
+function calcMultiStageProfitPlan(signalType, entryPrice, atr, closes, highs, lows, pivots) {
+    if(signalType === 'HOLD' || !atr) return { stages: [], trailSL: null, breakeven: false, timeExit: false, currentStage: 0 };
+    const n = closes.length;
+    let t1, t2, t3, sl, trailSL;
+    
+    if(signalType === 'BUY') {
+        sl = Math.max(entryPrice - 2 * atr, pivots?.s1 || entryPrice * 0.97);
+        t1 = pivots?.r1 && pivots.r1 > entryPrice ? pivots.r1 : entryPrice + 2 * atr;
+        t2 = pivots?.r2 && pivots.r2 > t1 ? pivots.r2 : entryPrice + 3.5 * atr;
+        t3 = entryPrice + 5 * atr;
+        
+        const runningHigh = Math.max(...highs.slice(-10));
+        const profitPct = ((runningHigh - entryPrice) / entryPrice) * 100;
+        
+        // Dynamic trailing: tightens as profit grows
+        if(profitPct > 2.0) { trailSL = runningHigh - 0.7 * atr; }
+        else if(profitPct > 1.5) { trailSL = runningHigh - atr; }
+        else if(profitPct > 1.0) { trailSL = Math.max(entryPrice, runningHigh - 1.5 * atr); }
+        else if(profitPct > 0.5) { trailSL = entryPrice - atr; }
+        else { trailSL = sl; }
+        
+    } else { // SELL
+        sl = Math.min(entryPrice + 2 * atr, pivots?.r1 || entryPrice * 1.03);
+        t1 = pivots?.s1 && pivots.s1 < entryPrice ? pivots.s1 : entryPrice - 2 * atr;
+        t2 = pivots?.s2 && pivots.s2 < t1 ? pivots.s2 : entryPrice - 3.5 * atr;
+        t3 = entryPrice - 5 * atr;
+        
+        const runningLow = Math.min(...lows.slice(-10));
+        const profitPct = ((entryPrice - runningLow) / entryPrice) * 100;
+        
+        if(profitPct > 2.0) { trailSL = runningLow + 0.7 * atr; }
+        else if(profitPct > 1.5) { trailSL = runningLow + atr; }
+        else if(profitPct > 1.0) { trailSL = Math.min(entryPrice, runningLow + 1.5 * atr); }
+        else if(profitPct > 0.5) { trailSL = entryPrice + atr; }
+        else { trailSL = sl; }
+    }
+    
+    // Determine current stage based on price movement
+    const ltp = closes[n-1];
+    let currentStage = 0;
+    const breakeven = signalType === 'BUY' ? 
+        ((Math.max(...highs.slice(-10)) - entryPrice) / entryPrice * 100 > 1.0) :
+        ((entryPrice - Math.min(...lows.slice(-10))) / entryPrice * 100 > 1.0);
+    
+    if(signalType === 'BUY') {
+        if(ltp >= t3) currentStage = 3;
+        else if(ltp >= t2) currentStage = 2;
+        else if(ltp >= t1) currentStage = 1;
+    } else {
+        if(ltp <= t3) currentStage = 3;
+        else if(ltp <= t2) currentStage = 2;
+        else if(ltp <= t1) currentStage = 1;
+    }
+    
+    return {
+        stages: [
+            { label: 'T1 (50%)', price: t1, booked: currentStage >= 1 },
+            { label: 'T2 (30%)', price: t2, booked: currentStage >= 2 },
+            { label: 'T3 (20%)', price: t3, booked: currentStage >= 3 }
+        ],
+        sl, trailSL, breakeven, currentStage,
+        rr: signalType === 'BUY' ? (t1 - entryPrice) / Math.max(entryPrice - sl, 0.01) : (entryPrice - t1) / Math.max(sl - entryPrice, 0.01)
+    };
+}
+
+// ==============================
+// AI MODULE 3: MOMENTUM DECAY DETECTOR (Enhanced)
+// ==============================
+function detectMomentumDecay(closes, vols, roc, macdHist) {
+    const n = closes.length;
+    const result = { decaying: false, score: 0, signals: [], exhaustion: false };
+    if(n < 15) return result;
+    
+    // 1. ROC of ROC (acceleration/deceleration)
+    if(roc) {
+        const rocRecent = [];
+        for(let i = Math.max(0, n-8); i < n; i++) if(roc[i] !== null) rocRecent.push(roc[i]);
+        if(rocRecent.length >= 4) {
+            const rocSlope = rocRecent[rocRecent.length-1] - rocRecent[0];
+            if(Math.abs(rocRecent[0]) > 0.3 && Math.sign(rocRecent[0]) !== Math.sign(rocSlope)) {
+                result.decaying = true; result.score += 30;
+                result.signals.push('ROC decelerating — momentum fading');
+            }
+        }
+    }
+    
+    // 2. Volume-weighted momentum: big moves on weak volume = fake
+    const recentVol = vols.slice(-5);
+    const avgVol = vols.slice(-20).reduce((a,b)=>a+b,0) / 20;
+    const recentMove = Math.abs(closes[n-1] - closes[n-5]) / closes[n-5] * 100;
+    if(recentMove > 0.5) {
+        const volRatio = recentVol.reduce((a,b)=>a+b,0) / (5 * avgVol);
+        if(volRatio < 0.6) {
+            result.score += 25;
+            result.signals.push('Price movement on WEAK volume');
+        }
+    }
+    
+    // 3. Exhaustion pattern: big candle followed by shrinking candles
+    const bodies = [];
+    for(let i = n-6; i < n; i++) bodies.push(Math.abs(closes[i] - (closes[i-1]||closes[i])));
+    if(bodies.length >= 5 && bodies[0] > 0) {
+        const bodyRatio = bodies[bodies.length-1] / bodies[0];
+        if(bodies[0] > bodies[1] && bodies[1] > bodies[2] && bodyRatio < 0.3) {
+            result.exhaustion = true; result.score += 35;
+            result.signals.push('Exhaustion: shrinking candles after big move');
+        }
+    }
+    
+    // 4. MACD histogram momentum decay
+    if(macdHist) {
+        const h = [];
+        for(let i = n-5; i < n; i++) if(macdHist[i] !== null) h.push(Math.abs(macdHist[i]));
+        if(h.length >= 3 && h[0] > h[1] && h[1] > h[2]) {
+            result.score += 20;
+            result.signals.push('MACD momentum weakening');
+        }
+    }
+    
+    result.decaying = result.score >= 30;
+    result.score = Math.min(result.score, 100);
+    return result;
+}
+
+// ==============================
+// AI MODULE 4: MARKET REGIME CLASSIFIER
+// ==============================
+function classifyMarketRegime(adxVal, bbUp, bbLo, closes, highs, lows) {
+    const n = closes.length;
+    let regime = 'ranging', confidence = 0;
+    const desc = [];
+    
+    // Bollinger Bandwidth
+    const lastBBW = (bbUp[n-1] && bbLo[n-1] && closes[n-1]) ? (bbUp[n-1] - bbLo[n-1]) / closes[n-1] : 0;
+    
+    // Average candle size (relative body)
+    let avgBody = 0;
+    for(let i = n-10; i < n; i++) avgBody += Math.abs(closes[i] - (closes[i-1]||closes[i]));
+    avgBody = avgBody / 10 / closes[n-1] * 100;
+    
+    // ADX-based classification
+    if(adxVal !== null) {
+        if(adxVal > 30) {
+            regime = 'trending'; confidence = 85;
+            desc.push(`ADX ${adxVal.toFixed(0)} — strong trend`);
+        } else if(adxVal > 25) {
+            regime = 'trending'; confidence = 65;
+            desc.push(`ADX ${adxVal.toFixed(0)} — moderate trend`);
+        } else if(adxVal < 18) {
+            regime = 'ranging'; confidence = 75;
+            desc.push(`ADX ${adxVal.toFixed(0)} — no trend, choppy`);
+        } else {
+            regime = 'ranging'; confidence = 50;
+            desc.push(`ADX ${adxVal.toFixed(0)} — weak/forming trend`);
+        }
+    }
+    
+    // Override with volatile if bandwidth is wide and candles are big
+    if(lastBBW > 0.04 && avgBody > 0.4) {
+        regime = 'volatile'; confidence = Math.max(confidence, 70);
+        desc.push('Wide BBands + large candles');
+    } else if(lastBBW < 0.015 && adxVal !== null && adxVal < 20) {
+        regime = 'ranging'; confidence = Math.max(confidence, 80);
+        desc.push('Tight BBands — squeeze/range');
+    }
+    
+    // Strategy adjustments per regime
+    let scoreMultiplier = 1.0, stopMultiplier = 1.0, strategy = '';
+    if(regime === 'trending') {
+        scoreMultiplier = 1.15; stopMultiplier = 0.9;
+        strategy = 'Trend-following: let winners run, tight trail';
+    } else if(regime === 'ranging') {
+        scoreMultiplier = 0.7; stopMultiplier = 1.0;
+        strategy = 'Mean-reversion: fade extremes, quick profits';
+    } else {
+        scoreMultiplier = 0.85; stopMultiplier = 1.4;
+        strategy = 'Volatile: wider stops, reduce size, be cautious';
+    }
+    
+    return { regime, confidence, desc: desc.join(' • '), scoreMultiplier, stopMultiplier, strategy, bbWidth: lastBBW, avgBody };
+}
+
+// ==============================
+// AI MODULE 5: SMART SIGNAL CONFIDENCE
+// ==============================
+function calcSignalConfidence(ltp, vwap, pivots, stDir, obvArr, mfiArr, closes, vols, bbUp, bbLo) {
+    const n = closes.length;
+    let confidence = 50, breakdown = {};
+    
+    // 1. Zone Analysis: price position relative to VWAP + Pivot + Supertrend
+    let zoneScore = 0;
+    const aboveVWAP = ltp > vwap;
+    const abovePivot = pivots ? ltp > pivots.pivot : null;
+    const bullST = stDir === 1;
+    
+    if(aboveVWAP) zoneScore += 20;
+    else zoneScore -= 20;
+    if(abovePivot === true) zoneScore += 15;
+    else if(abovePivot === false) zoneScore -= 15;
+    if(bullST) zoneScore += 20;
+    else zoneScore -= 20;
+    
+    breakdown.zone = { label: 'Price Zone', value: zoneScore > 20 ? 'Bullish' : zoneScore < -20 ? 'Bearish' : 'Neutral', score: zoneScore };
+    
+    // 2. Volume Flow: OBV slope + MFI trend
+    let flowScore = 0;
+    if(n > 5) {
+        const obvSlope = obvArr[n-1] - obvArr[n-5];
+        if(obvSlope > 0) flowScore += 15;
+        else flowScore -= 15;
+    }
+    const mfi = mfiArr[n-1];
+    if(mfi > 60) flowScore += 15;
+    else if(mfi < 40) flowScore -= 15;
+    
+    breakdown.flow = { label: 'Money Flow', value: flowScore > 10 ? 'Inflow' : flowScore < -10 ? 'Outflow' : 'Balanced', score: flowScore };
+    
+    // 3. BB position (proximity to bands)
+    let bbScore = 0;
+    if(bbUp[n-1] && bbLo[n-1]) {
+        const bbPos = (ltp - bbLo[n-1]) / (bbUp[n-1] - bbLo[n-1]);
+        if(bbPos > 0.9) bbScore = -15; // overbought
+        else if(bbPos < 0.1) bbScore = 15; // oversold
+        else if(bbPos > 0.6) bbScore = 5;
+        else if(bbPos < 0.4) bbScore = -5;
+        breakdown.bb = { label: 'BB Position', value: bbPos > 0.7 ? 'Upper' : bbPos < 0.3 ? 'Lower' : 'Middle', score: bbScore };
+    }
+    
+    // 4. Volume confirmation
+    let volConfirm = 0;
+    const avgV = vols.slice(-20).reduce((a,b)=>a+b,0) / 20;
+    const recentV = vols.slice(-3).reduce((a,b)=>a+b,0) / 3;
+    if(recentV > avgV * 1.5) volConfirm = 10;
+    else if(recentV < avgV * 0.5) volConfirm = -10;
+    breakdown.vol = { label: 'Vol Confirm', value: volConfirm > 0 ? 'Strong' : volConfirm < 0 ? 'Weak' : 'Normal', score: volConfirm };
+    
+    const totalContext = zoneScore + flowScore + bbScore + volConfirm;
+    confidence = Math.max(15, Math.min(95, 50 + totalContext * 0.5));
+    
+    return { confidence: Math.round(confidence), breakdown, totalContext };
+}
+
+// ==============================
+// AI MODULE 6: SESSION INTELLIGENCE
+// ==============================
+function getSessionIntelligence() {
+    const now = new Date();
+    const ist = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + (3600000 * 5.5));
+    const hm = ist.getHours() + ist.getMinutes() / 60;
+    const isWeekday = ist.getDay() >= 1 && ist.getDay() <= 5;
+    
+    if(!isWeekday || hm < 9.25 || hm > 15.5) {
+        return { name: 'Closed', icon: '🌙', quality: 'avoid', qualityClass: 'sq-avoid', strategy: 'Market closed — no trading', multiplier: 0, stopMultiplier: 1 };
+    }
+    
+    if(hm >= 9.25 && hm < 10.0) {
+        return { name: 'Opening Rush', icon: '🌅', quality: 'CAUTION', qualityClass: 'sq-poor', strategy: 'High volatility — wider stops, wait for pattern', multiplier: 0.8, stopMultiplier: 1.3 };
+    }
+    if(hm >= 10.0 && hm < 12.0) {
+        return { name: 'Morning Trend', icon: '☀️', quality: 'EXCELLENT', qualityClass: 'sq-excellent', strategy: 'Best trends — aggressive entries, ride momentum', multiplier: 1.2, stopMultiplier: 0.9 };
+    }
+    if(hm >= 12.0 && hm < 14.0) {
+        return { name: 'Midday Chop', icon: '😴', quality: 'AVOID', qualityClass: 'sq-avoid', strategy: 'Choppy — avoid entries or use tight ranges', multiplier: 0.5, stopMultiplier: 1.2 };
+    }
+    if(hm >= 14.0 && hm < 15.0) {
+        return { name: 'Power Hour', icon: '⚡', quality: 'GOOD', qualityClass: 'sq-good', strategy: 'Strong moves — follow institutional flow', multiplier: 1.1, stopMultiplier: 1.0 };
+    }
+    if(hm >= 15.0 && hm <= 15.5) {
+        return { name: 'Closing', icon: '🔔', quality: 'EXIT', qualityClass: 'sq-avoid', strategy: 'Book profits, NO new entries', multiplier: 0.3, stopMultiplier: 0.8 };
+    }
+    return { name: 'Pre-Market', icon: '🌅', quality: 'WAIT', qualityClass: 'sq-poor', strategy: 'Wait for market open', multiplier: 0, stopMultiplier: 1 };
+}
+
+// ==============================
+// SIGNAL HISTORY TRACKER
+// ==============================
+const SignalHistory = {
+    maxEntries: 20,
+    getHistory() {
+        try { return JSON.parse(localStorage.getItem('signalHistory') || '[]'); }
+        catch(e) { return []; }
+    },
+    addSignal(sym, signal, grade, price, conf) {
+        const hist = this.getHistory();
+        // Don't add duplicate for same stock within 2 minutes
+        const recent = hist.find(h => h.sym === sym && (Date.now() - h.time) < 120000);
+        if(recent) return hist;
+        hist.unshift({ sym: sym.replace('.NS',''), signal, grade, price, conf, time: Date.now(), outcome: null });
+        if(hist.length > this.maxEntries) hist.pop();
+        try { localStorage.setItem('signalHistory', JSON.stringify(hist)); } catch(e) {}
+        return hist;
+    },
+    getAccuracy() {
+        const hist = this.getHistory().filter(h => h.outcome !== null);
+        if(hist.length === 0) return { pct: 0, wins: 0, total: 0 };
+        const wins = hist.filter(h => h.outcome === 'win').length;
+        return { pct: Math.round(wins / hist.length * 100), wins, total: hist.length };
+    }
+};
+
+
 // ==============================
 async function getAlgorithmData(sym) {
     const [data,dailyData,mtf5m,mtf15m,mtf1h,niftyData,newsData] = await Promise.all([
@@ -1017,7 +1570,16 @@ async function getAlgorithmData(sym) {
     const now=new Date(),ist=new Date(now.getTime()+(now.getTimezoneOffset()*60000)+(3600000*5.5));
     const hM=ist.getHours()+ist.getMinutes()/60,isOpening=hM>=9.25&&hM<=10.5;
 
-    // SCORING
+    // ==============================
+    // AI INTEGRATION: Core Engine
+    // ==============================
+    
+    // AI 4: Market Regime Classification
+    const regimeData = classifyMarketRegime(dADX, bbUp, bbLo, closes, highs, lows);
+    
+    // AI 6: Session Intelligence
+    const sessionData = getSessionIntelligence(closes);
+
     let score=0;const ir={};
     if(ema9[len-1]!==null&&ema21[len-1]!==null){if(ema9[len-1]>ema21[len-1]){score+=10;ir.ema={signal:'BUY',value:'9>21',score:10};if(ema9Slope>0){score+=5;ir.ema.score=15;}}else{score-=10;ir.ema={signal:'SELL',value:'9<21',score:-10};if(ema9Slope<0){score-=5;ir.ema.score=-15;}}}
     if(cRsi!==null){if(cRsi<30){score+=20;ir.rsi={signal:'BUY',value:fmtShort(cRsi),score:20};}else if(cRsi<40){score+=10;ir.rsi={signal:'BUY',value:fmtShort(cRsi),score:10};}else if(cRsi>70){score-=20;ir.rsi={signal:'SELL',value:fmtShort(cRsi),score:-20};}else if(cRsi>60){score-=10;ir.rsi={signal:'SELL',value:fmtShort(cRsi),score:-10};}else{ir.rsi={signal:'NEUTRAL',value:fmtShort(cRsi),score:0};}}
@@ -1040,40 +1602,62 @@ async function getAlgorithmData(sym) {
 
     let mtfScore=0;
     [{data:mtf5m,w:12},{data:mtf15m,w:18},{data:mtf1h,w:25}].forEach(tf=>{if(tf.data&&!tf.data.chart?.error){const tQ=tf.data.chart.result[0].indicators.quote[0],tc=[];for(let i=0;i<tQ.close.length;i++)if(tQ.close[i]!==null)tc.push(tQ.close[i]);if(tc.length>20){const e9=calcEMA(tc,9),e21=calcEMA(tc,21),tl=tc.length-1;if(e9[tl]>e21[tl])mtfScore+=tf.w;else mtfScore-=tf.w;}}});
-    score+=mtfScore;
     const mtfText=mtfScore>25?'Aligned Bull':mtfScore<-25?'Aligned Bear':'Mixed';
     ir.mtf={signal:mtfScore>25?'BUY':mtfScore<-25?'SELL':'NEUTRAL',value:mtfText,score:mtfScore};
 
+    // AI 1: Apply Adaptive Weights
+    let adaptedWeights = AdaptiveWeights.autoLearn(sym, ir, closes);
+    let algoScore = AdaptiveWeights.applyWeights(ir, adaptedWeights);
+
     let niftyText='Neutral';
-    if(niftyData&&!niftyData.chart?.error&&sym!=='^NSEI.NS'){const nQ=niftyData.chart.result[0].indicators.quote[0],nc=[];for(let i=0;i<nQ.close.length;i++)if(nQ.close[i]!==null)nc.push(nQ.close[i]);if(nc.length>30){const nR=calcRSI(nc,14),nV=nR[nR.length-1];if(nV>60){score+=8;niftyText='Bullish';}else if(nV<40){score-=8;niftyText='Bearish';}}}
+    if(niftyData&&!niftyData.chart?.error&&sym!=='^NSEI.NS'){const nQ=niftyData.chart.result[0].indicators.quote[0],nc=[];for(let i=0;i<nQ.close.length;i++)if(nQ.close[i]!==null)nc.push(nQ.close[i]);if(nc.length>30){const nR=calcRSI(nc,14),nV=nR[nR.length-1];if(nV>60){algoScore+=12;niftyText='Bullish';}else if(nV<40){algoScore-=12;niftyText='Bearish';}}}
 
     let newsText='Neutral',nScore=0;
-    if(newsData?.news?.length>0){const pos=['growth','profit','surge','up','buy','bullish','high','record','deal','win','gains','positive','upgrade','jump','beat','rally','strong','rise'];const neg=['loss','fall','down','crash','bearish','sued','fraud','low','miss','sell','downgrade','plunge','negative','debt','breach','fine','weak','decline','drop'];newsData.news.forEach(n=>{const t=(n.title||'').toLowerCase();pos.forEach(w=>{if(t.includes(w))nScore++;});neg.forEach(w=>{if(t.includes(w))nScore--;});});if(nScore>2){score+=5;newsText='Positive';}else if(nScore<-2){score-=5;newsText='Negative';}}
+    if(newsData?.news?.length>0){const pos=['growth','profit','surge','up','buy','bullish','high','record','deal','win','gains','positive','upgrade','jump','beat','rally','strong','rise'];const neg=['loss','fall','down','crash','bearish','sued','fraud','low','miss','sell','downgrade','plunge','negative','debt','breach','fine','weak','decline','drop'];newsData.news.forEach(n=>{const t=(n.title||'').toLowerCase();pos.forEach(w=>{if(t.includes(w))nScore++;});neg.forEach(w=>{if(t.includes(w))nScore--;});});if(nScore>2){algoScore+=8;newsText='Positive';}else if(nScore<-2){algoScore-=8;newsText='Negative';}}
 
-    if(isOpening&&Math.abs(score)>20)score+=Math.sign(score)*5;
-    if(dADX!==null&&dADX<18&&Math.abs(score)<40)score*=0.5;
+    // Apply Regime & Session Multipliers
+    algoScore *= (regimeData.scoreMultiplier || 1.0);
+    if(Math.abs(algoScore) > 20) algoScore *= (sessionData.multiplier || 1.0);
 
-    let signalType='HOLD',conf=0,grade='C';
+    let signalType='HOLD',grade='C';
     const buyC=Object.values(ir).filter(v=>v.signal==='BUY').length,sellC=Object.values(ir).filter(v=>v.signal==='SELL').length,totalI=Object.keys(ir).length;
-    if(score>=60&&buyC>=8){signalType='BUY';grade='A+';conf=Math.min(92,65+buyC*2);}
-    else if(score>=45&&buyC>=6){signalType='BUY';grade='A';conf=Math.min(85,55+buyC*2);}
-    else if(score>=30&&buyC>=4){signalType='BUY';grade='B';conf=Math.min(72,45+buyC*2);}
-    else if(score<=-60&&sellC>=8){signalType='SELL';grade='A+';conf=Math.min(92,65+sellC*2);}
-    else if(score<=-45&&sellC>=6){signalType='SELL';grade='A';conf=Math.min(85,55+sellC*2);}
-    else if(score<=-30&&sellC>=4){signalType='SELL';grade='B';conf=Math.min(72,45+sellC*2);}
-    else{signalType='HOLD';grade='C';conf=Math.max(20,50-Math.abs(score));}
-
+    
+    // AI 5: Smart Confidence Generation
     const pivots=calcPivotLevels(dailyData);
-    let tEntry=ltp,tSL,t1,t2,rr;
-    if(signalType==='BUY'){tSL=Math.max(tEntry-2*atr,pivots?pivots.s1:tEntry*0.97);t1=pivots?.r1&&pivots.r1>tEntry?pivots.r1:tEntry+3*atr;t2=pivots?.r2&&pivots.r2>t1?pivots.r2:tEntry+5*atr;rr=(t1-tEntry)/Math.max(tEntry-tSL,0.01);}
-    else if(signalType==='SELL'){tSL=Math.min(tEntry+2*atr,pivots?pivots.r1:tEntry*1.03);t1=pivots?.s1&&pivots.s1<tEntry?pivots.s1:tEntry-3*atr;t2=pivots?.s2&&pivots.s2<t1?pivots.s2:tEntry-5*atr;rr=(tEntry-t1)/Math.max(tSL-tEntry,0.01);}
+    const confData = calcSignalConfidence(ltp, vwap, pivots, stDir[len-1], obvArr, mfiArr, closes, vols, bbUp, bbLo);
+    let conf = confData.confidence;
+    
+    // Final classification
+    if(algoScore>=75&&buyC>=8){signalType='BUY';grade='A+';conf=Math.min(99,conf+15);}
+    else if(algoScore>=50&&buyC>=6){signalType='BUY';grade='A';conf=Math.min(90,conf+10);}
+    else if(algoScore>=35&&buyC>=4){signalType='BUY';grade='B';conf=Math.min(80,conf+5);}
+    else if(algoScore<=-75&&sellC>=8){signalType='SELL';grade='A+';conf=Math.min(99,conf+15);}
+    else if(algoScore<=-50&&sellC>=6){signalType='SELL';grade='A';conf=Math.min(90,conf+10);}
+    else if(algoScore<=-35&&sellC>=4){signalType='SELL';grade='B';conf=Math.min(80,conf+5);}
+    else{signalType='HOLD';grade='C';conf=Math.max(20,50-Math.abs(algoScore));}
 
-    const trailing=calcTrailingStop(closes,highs,lows,atrArr,signalType,tEntry);
-    const reversal=detectMomentumReversal(closes,ema9,rsiArr,stochK,stDir,macdHist,vols);
-    const momentumScore=Math.max(-100,Math.min(100,score*0.8));
+    // AI 2: Multi-Stage Profit Booking & Trading Plan
+    const tradePlan = calcMultiStageProfitPlan(signalType, ltp, atr, closes, highs, lows, pivots);
+    const tEntry=ltp,tSL=tradePlan.sl,t1=tradePlan.stages[0]?.price,t2=tradePlan.stages[1]?.price,rr=tradePlan.rr;
+    const trailing = { trailingStop: tradePlan.trailSL, tightened: !!tradePlan.trailSL };
+
+    // AI 3: Momentum Decay Detection
+    const reversalRaw = detectMomentumReversal(closes,ema9,rsiArr,stochK,stDir,macdHist,vols);
+    const decayRaw = detectMomentumDecay(closes, vols, rocArr, macdHist);
+    const reversal = { 
+        score: Math.min(100, reversalRaw.score + decayRaw.score), 
+        signals: [...reversalRaw.signals, ...decayRaw.signals] 
+    };
+
+    const momentumScore=Math.max(-100,Math.min(100,algoScore*0.8));
     const change=ltp-(meta.chartPreviousClose||closes[0]),pChange=(change/(meta.chartPreviousClose||closes[0]))*100;
+    
+    // AI: Record Signal
+    if(signalType !== 'HOLD') {
+        SignalHistory.addSignal(sym, signalType, grade, ltp, conf);
+    }
 
-    return{sym,signalType,grade,conf,ltp,change,pChange,tEntry,tSL,t1,t2,rr,trailing,reversal,momentumScore,score,vwap,atr,dADX,cRsi,mfi,cSK,cSD,cROC,cWR,cSTDir,cSarDir,indicatorResults:ir,candlePatterns,bbSqueeze,rsiDiv,mtfText,niftyText,newsText,buyCount:buyC,sellCount:sellC,totalIndicators:totalI,pivots,isOpening,closes,opens,highs,lows,times,vols,ema9,vwapArr,bbUp,bbLo,supertrend,stDir,sar,sarDir,pivotLine:pivots?.pivot,r1:pivots?.r1,s1:pivots?.s1,r2:pivots?.r2,s2:pivots?.s2};
+    return{sym,signalType,grade,conf,confBreakdown:confData.breakdown,regimeData,sessionData,tradePlan,ltp,change,pChange,tEntry,tSL,t1,t2,rr,trailing,reversal,momentumScore,score:algoScore,vwap,atr,dADX,cRsi,mfi,cSK,cSD,cROC,cWR,cSTDir,cSarDir,indicatorResults:ir,candlePatterns,bbSqueeze,rsiDiv,mtfText,niftyText,newsText,buyCount:buyC,sellCount:sellC,totalIndicators:totalI,pivots,isOpening:sessionData.name==='Opening Rush',closes,opens,highs,lows,times,vols,ema9,vwapArr,bbUp,bbLo,supertrend,stDir,sar,sarDir,pivotLine:pivots?.pivot,r1:pivots?.r1,s1:pivots?.s1,r2:pivots?.r2,s2:pivots?.s2};
 }
 
 // ==============================
@@ -1095,6 +1679,128 @@ function renderMainCard(obj,isSilent){
     document.getElementById('rGrade').innerText=obj.grade;
     document.getElementById('rConfidence').innerText=`${Math.max(obj.buyCount,obj.sellCount)}/${obj.totalIndicators} agree • ${obj.conf}%`;
     document.getElementById('rSignalStrip').className='signal-strip sig-'+obj.signalType.toLowerCase();
+
+    // AI 4: Market Regime Badge
+    const rbw = document.getElementById('regimeBadgeWrap');
+    if(obj.regimeData) {
+        rbw.style.display = 'flex';
+        const rb = document.getElementById('regimeBadge');
+        rb.innerText = `● ${obj.regimeData.regime}`;
+        rb.className = `regime-badge regime-${obj.regimeData.regime}`;
+        document.getElementById('regimeDesc').innerText = `${obj.regimeData.desc} (${obj.regimeData.confidence}% conf)`;
+    } else rbw.style.display = 'none';
+
+    // AI 6: Session Intelligence
+    const sb = document.getElementById('sessionBar');
+    if(obj.sessionData) {
+        sb.style.display = 'flex';
+        document.getElementById('sessionIcon').innerText = obj.sessionData.icon;
+        document.getElementById('sessionName').innerText = obj.sessionData.name;
+        document.getElementById('sessionStrategy').innerText = obj.sessionData.strategy;
+        document.getElementById('sessionQuality').innerText = obj.sessionData.quality;
+        document.getElementById('sessionQuality').className = `session-quality ${obj.sessionData.qualityClass}`;
+    } else sb.style.display = 'none';
+
+    // AI 2: Trade Manager Panel
+    const tm = document.getElementById('tradeManager');
+    if(obj.signalType !== 'HOLD' && obj.tradePlan && obj.tradePlan.stages.length > 0) {
+        tm.style.display = 'block';
+        tm.className = 'trade-manager tm-active';
+        document.getElementById('tmStatusDot').className = 'tm-status-dot tm-status-active';
+        
+        let pnlText = '--';
+        if(obj.signalType === 'BUY') pnlText = `+${Math.max(0, ((obj.ltp - obj.tEntry) / obj.tEntry) * 100).toFixed(2)}%`;
+        else if(obj.signalType === 'SELL') pnlText = `+${Math.max(0, ((obj.tEntry - obj.ltp) / obj.tEntry) * 100).toFixed(2)}%`;
+        document.getElementById('tmPnl').innerText = pnlText;
+        document.getElementById('tmPnl').className = 'tm-pnl ' + (parseFloat(pnlText)>0 ? 'clr-green' : '');
+
+        obj.tradePlan.stages.forEach((st, i) => {
+            const el = document.getElementById(`tmStage${i+1}`);
+            if(el) {
+                el.innerHTML = `<div>${st.price ? fmt(st.price) : '--'}</div><span class="tm-stage-label">${st.label}</span>`;
+                el.className = 'tm-stage ' + (st.booked ? 'completed' : ((i===0 && !st.booked) || (i>0 && obj.tradePlan.stages[i-1].booked && !st.booked) ? 'active' : 'pending'));
+            }
+        });
+
+        const tw = document.getElementById('tmTrailWrap');
+        if(obj.tradePlan.trailSL) {
+            tw.innerHTML = `<div class="tm-trail-indicator"><span class="tm-trail-label">🛡️ Trailing Stop</span><span class="tm-trail-value">${fmt(obj.tradePlan.trailSL)}</span></div>`;
+        } else {
+            tw.innerHTML = `<div class="tm-trail-indicator"><span class="tm-trail-label">🛑 Initial SL</span><span class="tm-trail-value clr-red">${fmt(obj.tSL)}</span></div>`;
+        }
+        
+        const sx = document.getElementById('tmSmartExit');
+        if(obj.reversal.score >= 60) {
+            sx.innerHTML = `<div class="tm-smart-exit tm-exit-warn">⚠️ EXIT RECOMMENDED: ${obj.reversal.signals[0] || 'High reversal risk'}</div>`;
+        } else if(obj.reversal.score >= 35) {
+            sx.innerHTML = `<div class="tm-smart-exit" style="background:rgba(251,191,36,0.08);color:var(--amber);border:1px solid rgba(251,191,36,0.2);">⚠️ Tighten stops: Momentum slowing</div>`;
+        } else {
+            sx.innerHTML = `<div class="tm-smart-exit tm-exit-ok">✅ HOLD: Momentum is strong</div>`;
+        }
+        document.getElementById('tmTimeInTrade').innerText = `Entry: ${fmt(obj.tEntry)} | Risk-Reward 1:${Math.max(0,obj.rr||0).toFixed(1)}`;
+    } else {
+        tm.style.display = 'block';
+        tm.className = 'trade-manager tm-inactive';
+        document.getElementById('tmStatusDot').className = 'tm-status-dot tm-status-idle';
+        document.getElementById('tmPnl').innerText = 'WAITING';
+        document.getElementById('tmPnl').className = 'tm-pnl clr-amber';
+        [1,2,3].forEach(i => {
+            document.getElementById(`tmStage${i}`).innerHTML = `<div>--</div><span class="tm-stage-label">Target ${i}</span>`;
+            document.getElementById(`tmStage${i}`).className = 'tm-stage pending';
+        });
+        document.getElementById('tmTrailWrap').innerHTML = '';
+        document.getElementById('tmSmartExit').innerHTML = '';
+        document.getElementById('tmTimeInTrade').innerText = 'No active trade setup generated.';
+    }
+
+    // AI 5: Confidence Donut
+    const cd = document.getElementById('confidenceDonut');
+    if(obj.confBreakdown) {
+        cd.style.display = 'flex';
+        const tot = obj.totalIndicators;
+        const bPct = (obj.buyCount / tot) * 100.5;
+        const sPct = (obj.sellCount / tot) * 100.5;
+        const nPct = ((tot - obj.buyCount - obj.sellCount) / tot) * 100.5;
+        
+        document.getElementById('donutBull').style.strokeDasharray = `${bPct} 100.5`;
+        document.getElementById('donutBull').style.strokeDashoffset = `0`;
+        document.getElementById('donutBear').style.strokeDasharray = `${sPct} 100.5`;
+        document.getElementById('donutBear').style.strokeDashoffset = `-${bPct}`;
+        document.getElementById('donutNeut').style.strokeDasharray = `${nPct} 100.5`;
+        document.getElementById('donutNeut').style.strokeDashoffset = `-${bPct + sPct}`;
+
+        let legHtml = `
+            <div class="donut-leg-item"><div class="donut-leg-dot" style="background:var(--green)"></div>Bullish <span class="donut-leg-val">${obj.buyCount}</span></div>
+            <div class="donut-leg-item"><div class="donut-leg-dot" style="background:var(--red)"></div>Bearish <span class="donut-leg-val">${obj.sellCount}</span></div>
+            <div class="donut-leg-item"><div class="donut-leg-dot" style="background:var(--amber)"></div>Neutral <span class="donut-leg-val">${tot - obj.buyCount - obj.sellCount}</span></div>
+            <div style="margin-top:4px;padding-top:4px;border-top:1px solid var(--border);font-size:9px;color:var(--text-dim);">
+         `;
+        if(obj.confBreakdown.zone) legHtml += `Zone: <span style="color:var(--text);font-weight:700;">${obj.confBreakdown.zone.value}</span> &bull; `;
+        if(obj.confBreakdown.flow) legHtml += `Flow: <span style="color:var(--text);font-weight:700;">${obj.confBreakdown.flow.value}</span>`;
+        legHtml += `</div>`;
+        document.getElementById('donutLegend').innerHTML = legHtml;
+    } else cd.style.display = 'none';
+
+    // AI: Signal History
+    const sh = document.getElementById('signalHistory');
+    const hist = SignalHistory.getHistory().filter(h => h.sym === obj.sym.replace('.NS', ''));
+    if(hist.length > 0) {
+        sh.style.display = 'block';
+        const acc = SignalHistory.getAccuracy();
+        const shAcc = document.getElementById('shAccuracy');
+        shAcc.innerText = `Win Rate: ${acc.pct}% (${acc.wins}/${acc.total})`;
+        shAcc.style.background = acc.pct >= 50 ? 'rgba(52,211,153,0.1)' : 'rgba(248,113,113,0.1)';
+        shAcc.style.color = acc.pct >= 50 ? 'var(--green)' : 'var(--red)';
+        
+        let shHtml = '';
+        hist.slice(0, 5).forEach(h => {
+            const time = new Date(h.time).toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
+            const dc = h.outcome === 'win' ? 'win' : h.outcome === 'loss' ? 'loss' : 'pending';
+            const sc = h.signal === 'BUY' ? 'clr-green' : h.signal === 'SELL' ? 'clr-red' : '';
+            shHtml += `<div class="sh-item"><div class="sh-dot ${dc}"></div><div class="sh-sym">${h.sym}</div><div class="sh-sig ${sc}">${h.signal}</div><div class="sh-time">${time}</div><div class="sh-pnl">${h.outcome ? (h.outcome==='win'?'WIN':'LOSS') : '--'}</div></div>`;
+        });
+        document.getElementById('shList').innerHTML = shHtml;
+    } else sh.style.display = 'none';
 
     // Gauge
     const needleAngle=(obj.momentumScore/100)*90;
@@ -1124,10 +1830,9 @@ function renderMainCard(obj,isSilent){
     obj.candlePatterns.forEach((p,i)=>{const t=document.createElement('span');t.className='pattern-tag '+(p.type==='bullish'?'bullish':p.type==='bearish'?'bearish':'');t.style.animationDelay=i*0.05+'s';t.innerText=p.name;t.title=p.desc;pR.appendChild(t);});
     if(obj.bbSqueeze){const sq=document.createElement('span');sq.className='pattern-tag special';sq.innerText='⚡ SQUEEZE';sq.title='BB Squeeze — breakout imminent!';pR.appendChild(sq);}
 
-    // Trade Levels
-    const tl=document.getElementById('rTradeList');
-    if(obj.signalType==='HOLD'){tl.innerHTML=`<div class="detail-row"><span class="lbl">Price</span><span class="val">${fmt(obj.ltp)}</span></div><div class="detail-row"><span class="lbl">Pivot</span><span class="val">${obj.pivotLine?fmt(obj.pivotLine):'--'}</span></div><div class="detail-row"><span class="lbl">Status</span><span class="val clr-amber">Waiting...</span></div>`;}
-    else{const slL=obj.trailing.trailingStop?('SL'+(obj.trailing.tightened?' (Tight)':'')):'SL';const slV=obj.trailing.trailingStop?fmt(obj.trailing.trailingStop):fmt(obj.tSL);tl.innerHTML=`<div class="detail-row"><span class="lbl">📍 Entry</span><span class="val">${fmt(obj.tEntry)}</span></div><div class="detail-row"><span class="lbl clr-red">🛑 ${slL}</span><span class="val clr-red">${slV}</span></div><div class="detail-row"><span class="lbl clr-green">🎯 Target 1</span><span class="val clr-green">${fmt(obj.t1)}</span></div><div class="detail-row"><span class="lbl clr-green">🎯 Target 2</span><span class="val clr-green">${fmt(obj.t2)}</span></div><div class="detail-row"><span class="lbl">⚖️ R:R</span><span class="val">1:${Math.max(0,obj.rr||0).toFixed(2)}</span></div>${obj.trailing.tightened?'<div class="detail-row"><span class="lbl">🔒 Trail</span><span class="val clr-green">Protected</span></div>':''}`;}
+    // Old Trade Levels & Exit Panels Hidden (replaced by new Trade Manager)
+    document.getElementById('rTradeList').parentElement.style.display = 'none';
+    document.getElementById('exitPanel').style.display = 'none';
 
     // Metrics
     document.getElementById('rIndList').innerHTML=`<div class="detail-row"><span class="lbl">RSI</span><span class="val">${obj.cRsi?fmtShort(obj.cRsi):'--'}</span></div><div class="detail-row"><span class="lbl">StochRSI</span><span class="val">${obj.cSK?fmtShort(obj.cSK)+'/'+fmtShort(obj.cSD):'--'}</span></div><div class="detail-row"><span class="lbl">ADX</span><span class="val">${obj.dADX?fmtShort(obj.dADX):'--'}</span></div><div class="detail-row"><span class="lbl">ATR</span><span class="val">${obj.atr?fmt(obj.atr):'--'}</span></div><div class="detail-row"><span class="lbl">MFI</span><span class="val">${obj.mfi?fmtShort(obj.mfi):'--'}</span></div><div class="detail-row"><span class="lbl">ROC</span><span class="val">${obj.cROC?fmtShort(obj.cROC)+'%':'--'}</span></div><div class="detail-row"><span class="lbl">W%R</span><span class="val">${obj.cWR?fmtShort(obj.cWR):'--'}</span></div>`;
@@ -1136,20 +1841,25 @@ function renderMainCard(obj,isSilent){
     const mg=document.getElementById('matrixGrid');mg.innerHTML='';
     const iN={ema:'EMA',rsi:'RSI',macd:'MACD',vwap:'VWAP',adx:'ADX',supertrend:'SuperT',stochRsi:'StochRSI',roc:'ROC',williamsR:'W%R',psar:'PSAR',obv:'OBV',mfi:'MFI',bbands:'BBands',heikinAshi:'H-Ashi',rsiDiv:'RSI Div',volSpike:'Vol',mtf:'MTF'};
     let cellIdx=0;
-    Object.entries(obj.indicatorResults).forEach(([key,val])=>{const cell=document.createElement('div');cell.className='ind-cell';cell.style.animationDelay=(cellIdx*0.03)+'s';cellIdx++;const dc=val.signal==='BUY'?'bull':val.signal==='SELL'?'bear':'neutral';cell.innerHTML=`<div class="ind-dot ${dc}"></div><span class="ind-name">${iN[key]||key}</span><span class="ind-val">${val.value||''}</span>`;mg.appendChild(cell);});
-
-    // Exit
-    const ep=document.getElementById('exitPanel'),ea=document.getElementById('exitAction'),er=document.getElementById('exitReason'),el=document.getElementById('exitLevels');
-    if(obj.reversal.score>=60){ep.className='section-card exit-panel exit-red animate-fade-up stagger-6';ea.innerHTML=`<span class="clr-red">⚠️ EXIT NOW</span>`;er.innerHTML=`Reversal risk ${obj.reversal.score}%: ${obj.reversal.signals.join(' • ')}`;el.innerHTML=obj.trailing.trailingStop?`<span class="exit-tag">Trail SL: ${fmt(obj.trailing.trailingStop)}</span>`:'';}
-    else if(obj.reversal.score>=35){ep.className='section-card exit-panel exit-amber animate-fade-up stagger-6';ea.innerHTML=`<span class="clr-amber">⚠️ TIGHTEN STOPS</span>`;er.innerHTML=obj.reversal.signals.length>0?obj.reversal.signals.join(' • '):'Monitor closely.';el.innerHTML=obj.trailing.trailingStop?`<span class="exit-tag">Trail SL: ${fmt(obj.trailing.trailingStop)}</span>`:'';}
-    else if(obj.signalType!=='HOLD'){ep.className='section-card exit-panel exit-green animate-fade-up stagger-6';ea.innerHTML=`<span class="clr-green">✅ HOLD — Momentum OK</span>`;er.innerHTML='Low reversal risk. Let profits run.';el.innerHTML=`${obj.trailing.trailingStop?`<span class="exit-tag">Trail: ${fmt(obj.trailing.trailingStop)}</span>`:''}<span class="exit-tag">T1: ${fmt(obj.t1)}</span><span class="exit-tag">T2: ${fmt(obj.t2)}</span>`;}
-    else{ep.className='section-card exit-panel exit-amber animate-fade-up stagger-6';ea.innerHTML=`<span class="clr-amber">⏸ NO TRADE</span>`;er.innerHTML=`${obj.buyCount} bullish vs ${obj.sellCount} bearish of ${obj.totalIndicators}. Wait.`;el.innerHTML='';}
+    Object.entries(obj.indicatorResults).forEach(([key,val])=>{
+        const cell=document.createElement('div');cell.className='ind-cell';cell.style.animationDelay=(cellIdx*0.03)+'s';cellIdx++;
+        const dc=val.signal==='BUY'?'bull':val.signal==='SELL'?'bear':'neutral';
+        // Show adaptive weight badge if significant deviation from base weight
+        let weightBadge = '';
+        if(val.adaptedWeight && AdaptiveWeights.defaultWeights[key] && Math.abs(val.adaptedWeight - AdaptiveWeights.defaultWeights[key]) > 2) {
+            weightBadge = `<span class="adaptive-badge" title="AI Learned Weight: ${val.adaptedWeight.toFixed(1)}">AI ${(val.adaptedWeight/AdaptiveWeights.defaultWeights[key]).toFixed(1)}x</span>`;
+        }
+        cell.innerHTML=`<div class="ind-dot ${dc}"></div><span class="ind-name">${iN[key]||key}</span>${weightBadge}<span class="ind-val">${val.value||''}</span>`;
+        mg.appendChild(cell);
+    });
 
     // Summary
     let nar='';
     if(obj.signalType!=='HOLD'){nar+=`<strong>${obj.signalType} (${obj.grade})</strong> — ${Math.max(obj.buyCount,obj.sellCount)}/${obj.totalIndicators} indicators aligned. `;if(obj.trailing.tightened)nar+='<strong>Trailing stop tightened.</strong> ';if(obj.reversal.score>40)nar+=`<span class="clr-amber">Reversal risk ${obj.reversal.score}%.</span> `;if(obj.rsiDiv.type)nar+=`<span class="clr-amber">${obj.rsiDiv.desc}</span> `;if(obj.bbSqueeze)nar+='<span style="color:var(--purple)">BB Squeeze — breakout imminent.</span> ';}
     else{nar+=`No clear signal. ${obj.buyCount} bull, ${obj.sellCount} bear of ${obj.totalIndicators}. `;if(obj.dADX!==null&&obj.dADX<20)nar+='Choppy market — avoid. ';}
-    nar+=`MTF: ${obj.mtfText} | Nifty: ${obj.niftyText} | News: ${obj.newsText}`;
+    if(obj.sessionData) nar+=`<br>Session: ${obj.sessionData.name} — ${obj.sessionData.strategy}. `;
+    if(obj.regimeData) nar+=`Regime: ${obj.regimeData.regime}. `;
+    nar+=`News: ${obj.newsText}`;
     document.getElementById('rAnalysisText').innerHTML=nar;
 
     DOM.resultCard.style.display='block';
