@@ -1231,7 +1231,11 @@ async function scanMarketLeaders() {
     const progBar = document.getElementById('scanProgressBar');
     
     progCont.style.display = 'block';
+    statusText.innerText = '1/2: Checking 150 Stocks...';
+    statusText.style.background = 'rgba(99,102,241,0.1)';
+    statusText.style.color = 'var(--blue)';
     
+    // ----------- STAGE 1: BULK SCAN -----------
     const BATCH_SIZE = 40;
     const allValidStocks = [];
     
@@ -1276,31 +1280,67 @@ async function scanMarketLeaders() {
                     }
                 });
             }
-        } catch(e) { console.error('Batch error', e); }
+        } catch(e) {}
         
-        progBar.style.width = Math.round(((i + BATCH_SIZE) / SCANNER_POOL.length) * 100) + '%';
+        progBar.style.width = Math.round(((i + BATCH_SIZE) / SCANNER_POOL.length) * 50) + '%';
+    }
+    
+    if (allValidStocks.length === 0) {
+        progCont.style.display = 'none';
+        listBullish.innerHTML = '<div class="leader-empty">No stocks found in range</div>';
+        listBearish.innerHTML = '<div class="leader-empty">No stocks found in range</div>';
+        statusText.innerText = 'Checked 150 (None found)';
+        return;
+    }
+    
+    allValidStocks.sort((a,b) => b.pct - a.pct);
+    const positiveStocks = allValidStocks.filter(s => s.pct >= 0);
+    const negativeStocks = allValidStocks.filter(s => s.pct < 0).reverse();
+    
+    // Shortlist top 8 gainers and top 8 losers for deep scan
+    const shortList = [...positiveStocks.slice(0, 8), ...negativeStocks.slice(0, 8)];
+    
+    // ----------- STAGE 2: DEEP ALGO SCAN -----------
+    statusText.innerText = `2/2: Deep Analyzing ${shortList.length} leads...`;
+    const finalBullish = [];
+    const finalBearish = [];
+    
+    for (let i = 0; i < shortList.length; i++) {
+        try {
+            const symRaw = shortList[i].sym.replace('.NS', '');
+            // Run exactly the same full algorithm engine secretly
+            const algoData = await getAlgorithmData(symRaw + '.NS');
+            
+            if (algoData.signalType === 'BUY') {
+                finalBullish.push({
+                    sym: symRaw, price: shortList[i].price, pct: shortList[i].pct,
+                    conf: algoData.conf, grade: algoData.grade, score: algoData.score
+                });
+            } else if (algoData.signalType === 'SELL') {
+                finalBearish.push({
+                    sym: symRaw, price: shortList[i].price, pct: shortList[i].pct,
+                    conf: algoData.conf, grade: algoData.grade, score: algoData.score
+                });
+            }
+        } catch(e) {}
+        
+        progBar.style.width = Math.round(50 + ((i + 1) / shortList.length) * 50) + '%';
     }
     
     progCont.style.display = 'none';
     
-    if (allValidStocks.length === 0) {
-        listBullish.innerHTML = '<div class="leader-empty">No stocks found in range</div>';
-        listBearish.innerHTML = '<div class="leader-empty">No stocks found in range</div>';
-        statusText.innerText = 'Failed';
-        return;
-    }
+    // Sort mathematically mathematically by algorithmic confluence score
+    finalBullish.sort((a,b) => b.score - a.score);
+    finalBearish.sort((a,b) => a.score - b.score);
     
-    // Sort by Momentum (% Change)
-    allValidStocks.sort((a,b) => b.pct - a.pct);
-    
-    const topGainers = allValidStocks.slice(0, 5);
-    const topLosers = allValidStocks.slice(-5).reverse();
+    const topGainers = finalBullish.slice(0, 5);
+    const topLosers = finalBearish.slice(0, 5);
     
     const renderItem = (item, isUp) => `
-        <li class="leader-item" onclick="DOM.symbolInput.value='${item.sym.replace('.NS','')}'; analyzeInput();">
+        <li class="leader-item" onclick="DOM.symbolInput.value='${item.sym}'; analyzeInput();">
             <div>
-                <div class="leader-sym">${item.sym.replace('.NS','')}</div>
-                <div class="leader-action">${isUp ? 'Strong Buy Candidate' : 'Strong Sell Candidate'}</div>
+                <div class="leader-sym">${item.sym} <span style="font-size:10px; opacity:0.8; margin-left:4px;" class="${isUp?'clr-green':'clr-red'}">${item.grade} (${item.conf}%)</span></div>
+                <div class="leader-action">${isUp ? 'Strong Buy Confirmed' : 'Strong Sell Confirmed'}</div>
             </div>
             <div class="leader-metrics">
                 <div class="leader-price">${fmt(item.price)}</div>
@@ -1309,10 +1349,10 @@ async function scanMarketLeaders() {
         </li>
     `;
     
-    listBullish.innerHTML = topGainers.map(item => renderItem(item, true)).join('');
-    listBearish.innerHTML = topLosers.map(item => renderItem(item, false)).join('');
+    listBullish.innerHTML = topGainers.length ? topGainers.map(item => renderItem(item, true)).join('') : '<div class="leader-empty">No High-Confidence Buys</div>';
+    listBearish.innerHTML = topLosers.length ? topLosers.map(item => renderItem(item, false)).join('') : '<div class="leader-empty">No High-Confidence Sells</div>';
     
-    statusText.innerText = `Checked ${SCANNER_POOL.length} stocks`;
+    statusText.innerText = `Analyzed ${shortList.length} potentials`;
     statusText.style.background = 'rgba(52,211,153,0.1)';
     statusText.style.color = 'var(--green)';
 }
