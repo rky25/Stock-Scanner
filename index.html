@@ -783,6 +783,40 @@
             border-radius: 10px; background: rgba(192,132,252,0.1);
             color: var(--purple); border: 1px solid rgba(192,132,252,0.2);
         }
+
+        /* ============================================
+           SENTINEL UI
+        ============================================ */
+        .sent-btn-init { width: 100%; margin-top: 15px; padding: 12px; background: linear-gradient(135deg, var(--blue), #6366f1); border: none; border-radius: var(--radius); color: #fff; font-size: 15px; font-weight: 900; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(59,130,246,0.3); transition: transform 0.2s; }
+        .sent-btn-init:active { transform: scale(0.97); }
+        .sentinel-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.96); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: env(safe-area-inset-bottom, 20px); }
+        .sentinel-setup { width: 92%; max-width: 400px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 24px; text-align: center; margin-bottom: auto; margin-top: auto; position: relative; animation: fadeUpSentinel 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .sent-input { width: 100%; background: rgba(0,0,0,0.5); border: 2px solid var(--blue); border-radius: 12px; color: #fff; font-size: 30px; font-weight: 900; padding: 18px; text-align: center; margin-bottom: 24px; outline: none; }
+        .sent-input:focus { border-color: #6366f1; box-shadow: 0 0 15px rgba(99,102,241,0.4); }
+        .sent-btn { width: 100%; padding: 18px; background: var(--green); border: none; border-radius: 12px; color: #000; font-size: 16px; font-weight: 900; letter-spacing: 1px; cursor: pointer; }
+        
+        .sentinel-dash { width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; padding: 20px; position: relative; animation: fadeUpSentinel 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .sent-head { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 800; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 25px; margin-top: env(safe-area-inset-top, 20px); }
+        .sent-pulse { width: 8px; height: 8px; background: var(--blue); border-radius: 50%; box-shadow: 0 0 10px var(--blue); animation: pulse 2s infinite; }
+        .sent-pulse.sent-red { background: var(--red); box-shadow: 0 0 10px var(--red); }
+        .sent-pulse.sent-green { background: var(--green); box-shadow: 0 0 10px var(--green); }
+        .sent-sym { font-size: 42px; font-weight: 900; line-height: 1; margin-bottom: 4px; }
+        .sent-entry-lbl { font-size: 14px; color: var(--text-dim); font-weight: 600; margin-bottom: 2px; }
+        .sent-entry-val { font-size: 26px; font-weight: 800; color: #fff; margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
+        
+        .sent-status-card { background: rgba(255,255,255,0.05); border: 2px solid var(--border); border-radius: 16px; padding: 30px 20px; text-align: center; margin-bottom: 30px; transition: all 0.3s; }
+        .sent-command { font-size: 38px; font-weight: 900; margin-bottom: 12px; text-shadow: 0 0 20px rgba(0,0,0,0.5); line-height: 1.1; }
+        .sent-detail { font-size: 16px; color: var(--text-dim); font-weight: 600; line-height: 1.5; }
+        
+        .sent-pnl-lbl { font-size: 13px; color: var(--text-dim); font-weight: 700; text-align: center; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .sent-pnl-val { font-size: 64px; font-weight: 900; text-align: center; line-height: 1; margin-bottom: 40px; font-variant-numeric: tabular-nums; text-shadow: 0 0 30px rgba(0,0,0,0.4); }
+        .sent-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: auto; }
+        .sent-metrics-box { background: rgba(255,255,255,0.05); border-radius: 14px; padding: 18px; text-align: center; }
+        .sent-metrics label { display: block; font-size: 11px; color: var(--text-dim); font-weight: 700; text-transform: uppercase; margin-bottom: 5px; }
+        .sent-metrics span { font-size: 22px; font-weight: 800; color: #fff; font-variant-numeric: tabular-nums; }
+        
+        @keyframes fadeUpSentinel { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+        .sentinel-overlay.active { display: flex; animation: fadeIn 0.2s ease forwards; }
     </style>
 </head>
 <body>
@@ -902,6 +936,7 @@
             <div id="tmTrailWrap"></div>
             <div id="tmSmartExit"></div>
             <div class="tm-time-in-trade" id="tmTimeInTrade"></div>
+            <button class="sent-btn-init" onclick="openSentinelSetup()">⚔️ LOG LIVE TRADE</button>
         </div>
 
         <!-- AI: Confidence Donut -->
@@ -1010,6 +1045,43 @@
     </footer>
 </div>
 
+<!-- ==================== ACTIVE TRADE SENTINEL ==================== -->
+<div class="sentinel-overlay" id="sentinelOverlay">
+    <div class="sentinel-setup" id="sentinelSetup">
+        <button class="port-rm" onclick="closeSentinel()" style="position:absolute;top:15px;right:15px;">✖</button>
+        <div style="font-size:20px;font-weight:900;margin-bottom:20px;color:#fff;">⚔️ Live Trade Handover</div>
+        <div id="setupSym" style="font-size:36px;font-weight:900;margin-bottom:10px;">--</div>
+        <div id="setupSide" style="padding:8px 18px;border-radius:100px;background:var(--green);display:inline-block;margin-bottom:30px;font-weight:900;font-size:14px;letter-spacing:1px;">BUY MODE</div>
+        
+        <label style="display:block;margin-bottom:12px;color:var(--text-dim);font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:1px;">Enter Your Cost Basis</label>
+        <input type="number" id="setupPriceInput" step="0.05" class="sent-input" placeholder="0.00">
+        
+        <button class="sent-btn" onclick="startSentinelConfirmed()">CONFIRM & ENGAGE SENTINEL</button>
+    </div>
+
+    <div class="sentinel-dash" id="sentinelDash" style="display:none;">
+        <div class="sent-head">
+            <div class="sent-pulse" id="sentinelPulse"></div> Active Sentinel Engine
+            <button class="port-rm" onclick="closeSentinel()" style="margin-left:auto;color:#fff;background:rgba(255,255,255,0.1);border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;">✖</button>
+        </div>
+        <div class="sent-sym" id="sentinelSym">--</div>
+        <div class="sent-entry-lbl">Cost Basis</div>
+        <div class="sent-entry-val" id="sentinelEntryVal">--</div>
+        
+        <div class="sent-status-card" id="sentinelStatusCard">
+            <div class="sent-command" id="sentinelCommand">--</div>
+            <div class="sent-detail" id="sentinelDetail">--</div>
+        </div>
+        
+        <div class="sent-pnl-lbl">Live Trade P&L</div>
+        <div class="sent-pnl-val clr-green" id="sentinelLivePnl">0.00%</div>
+        <div class="sent-metrics">
+            <div class="sent-metrics-box"><label>Current LTP</label><span id="sentinelLtp">--</span></div>
+            <div class="sent-metrics-box"><label>Trailing SL</label><span id="sentinelTs">--</span></div>
+        </div>
+    </div>
+</div>
+
 <!-- ==================== JAVASCRIPT ==================== -->
 <script>
 // ==============================
@@ -1031,7 +1103,7 @@ const DOM = {
 const fmt = (n) => '₹' + parseFloat(n).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const fmtShort = (n) => parseFloat(n).toFixed(2);
 
-let activeSymbol = null, mainSignalMem = null;
+let activeSymbol = null, mainSignalMem = null, mainObjMem = null;
 let tvChart = null, candleSeries = null, line1Series = null, line2Series = null, upperSeries = null, lowerSeries = null;
 let portfolio = new Set(), portfolioSignals = {};
 
@@ -1636,9 +1708,66 @@ async function getAlgorithmData(sym) {
     else if(algoScore<=-35&&sellC>=4){signalType='SELL';grade='B';conf=Math.min(80,conf+5);}
     else{signalType='HOLD';grade='C';conf=Math.max(20,50-Math.abs(algoScore));}
 
-    // AI 2: Multi-Stage Profit Booking & Trading Plan
-    const tradePlan = calcMultiStageProfitPlan(signalType, ltp, atr, closes, highs, lows, pivots);
-    const tEntry=ltp,tSL=tradePlan.sl,t1=tradePlan.stages[0]?.price,t2=tradePlan.stages[1]?.price,rr=tradePlan.rr;
+    // AI 2: Pro Trader Entry & Exit Engine
+    const lastOpen = opens[len-1], lastHigh = highs[len-1], lastLow = lows[len-1], lastClose = closes[len-1];
+    const avgVol = vols.slice(-10).reduce((a,b)=>a+b,0)/10;
+    const isHammer = Math.min(lastOpen, lastClose) - lastLow > 2 * Math.abs(lastClose - lastOpen) && lastHigh - Math.max(lastOpen, lastClose) < Math.abs(lastClose - lastOpen);
+    const isShootingStar = lastHigh - Math.max(lastOpen, lastClose) > 2 * Math.abs(lastClose - lastOpen) && Math.min(lastOpen, lastClose) - lastLow < Math.abs(lastClose - lastOpen);
+
+    let optimalEntryPrice = ltp;
+    let entryMsg = 'No strong setup';
+    let entryType = 'normal';
+    
+    if(signalType === 'BUY') {
+        const targetPullback = Math.max(ema9[len-1], vwapArr[len-1]);
+        const distToMean = ((ltp - targetPullback) / targetPullback) * 100;
+        
+        if(distToMean > 0.6) {
+            optimalEntryPrice = targetPullback + (0.2 * atr);
+            entryMsg = `Overextended! Wait for Low-Vol Pullback to ${fmtShort(optimalEntryPrice)}`;
+            entryType = 'pullback';
+        } else if (distToMean <= 0.6 && distToMean > -0.3) {
+            if (isHammer || candlePatterns.some(p => p.type === 'bullish')) {
+                entryMsg = `Bullish Rejection at Support! BUY NOW at ${fmtShort(ltp)}`;
+                entryType = 'rejection';
+            } else if (vols[len-1] < avgVol * 0.8) {
+                 entryMsg = `Low Volume Pullback confirmed. Prep to BUY near ${fmtShort(ltp)}`;
+                 entryType = 'now';
+            } else {
+                entryMsg = `Buy Zone Active (EMA/VWAP) near ${fmtShort(ltp)}`;
+                entryType = 'now';
+            }
+        } else {
+             entryMsg = `Momentum fading. Wait for reclaim of ${fmtShort(targetPullback)}`;
+             entryType = 'pullback';
+        }
+    } else if(signalType === 'SELL') {
+        const targetBounce = Math.min(ema9[len-1], vwapArr[len-1]);
+        const distToMean = ((targetBounce - ltp) / targetBounce) * 100;
+        
+        if (distToMean > 0.6) {
+            optimalEntryPrice = targetBounce - (0.2 * atr);
+            entryMsg = `Oversold! Wait for Low-Vol Bounce to ${fmtShort(optimalEntryPrice)}`;
+            entryType = 'pullback';
+        } else if (distToMean <= 0.6 && distToMean > -0.3) {
+            if (isShootingStar || candlePatterns.some(p => p.type === 'bearish')) {
+                entryMsg = `Bearish Rejection at Resistance! SELL NOW at ${fmtShort(ltp)}`;
+                entryType = 'rejection';
+            } else if (vols[len-1] < avgVol * 0.8) {
+                entryMsg = `Low Volume Bounce confirmed. Prep to SELL near ${fmtShort(ltp)}`;
+                entryType = 'now';
+            } else {
+                entryMsg = `Sell Zone Active (EMA/VWAP) near ${fmtShort(ltp)}`;
+                entryType = 'now';
+            }
+        } else {
+            entryMsg = `Momentum fading. Wait for firm breakdown of ${fmtShort(targetBounce)}`;
+            entryType = 'pullback';
+        }
+    }
+
+    const tradePlan = calcMultiStageProfitPlan(signalType, optimalEntryPrice, atr, closes, highs, lows, pivots);
+    const tEntry=optimalEntryPrice,tSL=tradePlan.sl,t1=tradePlan.stages[0]?.price,t2=tradePlan.stages[1]?.price,rr=tradePlan.rr;
     const trailing = { trailingStop: tradePlan.trailSL, tightened: !!tradePlan.trailSL };
 
     // AI 3: Momentum Decay Detection
@@ -1657,7 +1786,7 @@ async function getAlgorithmData(sym) {
         SignalHistory.addSignal(sym, signalType, grade, ltp, conf);
     }
 
-    return{sym,signalType,grade,conf,confBreakdown:confData.breakdown,regimeData,sessionData,tradePlan,ltp,change,pChange,tEntry,tSL,t1,t2,rr,trailing,reversal,momentumScore,score:algoScore,vwap,atr,dADX,cRsi,mfi,cSK,cSD,cROC,cWR,cSTDir,cSarDir,indicatorResults:ir,candlePatterns,bbSqueeze,rsiDiv,mtfText,niftyText,newsText,buyCount:buyC,sellCount:sellC,totalIndicators:totalI,pivots,isOpening:sessionData.name==='Opening Rush',closes,opens,highs,lows,times,vols,ema9,vwapArr,bbUp,bbLo,supertrend,stDir,sar,sarDir,pivotLine:pivots?.pivot,r1:pivots?.r1,s1:pivots?.s1,r2:pivots?.r2,s2:pivots?.s2};
+    return{sym,signalType,grade,conf,confBreakdown:confData.breakdown,regimeData,sessionData,tradePlan,ltp,change,pChange,tEntry,entryMsg,entryType,tSL,t1,t2,rr,trailing,reversal,momentumScore,score:algoScore,vwap,atr,dADX,cRsi,mfi,cSK,cSD,cROC,cWR,cSTDir,cSarDir,indicatorResults:ir,candlePatterns,bbSqueeze,rsiDiv,mtfText,niftyText,newsText,buyCount:buyC,sellCount:sellC,totalIndicators:totalI,pivots,isOpening:sessionData.name==='Opening Rush',closes,opens,highs,lows,times,vols,ema9,vwapArr,bbUp,bbLo,supertrend,stDir,sar,sarDir,pivotLine:pivots?.pivot,r1:pivots?.r1,s1:pivots?.s1,r2:pivots?.r2,s2:pivots?.s2};
 }
 
 // ==============================
@@ -1666,6 +1795,7 @@ async function getAlgorithmData(sym) {
 function renderMainCard(obj,isSilent){
     if(mainSignalMem!==null&&obj.signalType!==mainSignalMem&&obj.signalType!=='HOLD'){if("Notification"in window&&Notification.permission==="granted")new Notification(`🚨 ${obj.signalType} ${obj.grade}: ${obj.sym.replace('.NS','')}`,{body:`Signal at ${fmt(obj.ltp)}`});}
     mainSignalMem=obj.signalType;
+    mainObjMem=obj;
 
     document.getElementById('rSymbol').innerText=obj.sym.replace('.NS','');
     if(!isSilent)document.getElementById('rTime').innerText=`${new Date().toLocaleTimeString('en-IN')}`;
@@ -1737,7 +1867,18 @@ function renderMainCard(obj,isSilent){
         } else {
             sx.innerHTML = `<div class="tm-smart-exit tm-exit-ok">✅ HOLD: Momentum is strong</div>`;
         }
-        document.getElementById('tmTimeInTrade').innerText = `Entry: ${fmt(obj.tEntry)} | Risk-Reward 1:${Math.max(0,obj.rr||0).toFixed(1)}`;
+        let entryHtml = '';
+        if (obj.entryType === 'pullback') {
+            entryHtml = `<div style="padding: 6px 10px; background: rgba(251,191,36,0.1); border: 1px solid var(--amber-border); border-radius: 6px; color: var(--amber); font-weight: 800; margin-top: 6px; display: inline-block;">⚠️ ${obj.entryMsg}</div>`;
+        } else if (obj.entryType === 'rejection') {
+             entryHtml = `<div style="padding: 6px 10px; background: rgba(52,211,153,0.15); border: 1px solid var(--green-border); border-radius: 6px; color: var(--green); font-weight: 900; margin-top: 6px; display: inline-block;">🔥 ${obj.entryMsg}</div>`;
+             if (obj.signalType === 'SELL') entryHtml = `<div style="padding: 6px 10px; background: rgba(248,113,113,0.15); border: 1px solid var(--red-border); border-radius: 6px; color: var(--red); font-weight: 900; margin-top: 6px; display: inline-block;">🔥 ${obj.entryMsg}</div>`;
+        } else {
+            entryHtml = `<div>🎯 <span style="font-weight: 800; color: var(--text-bright);">${obj.entryMsg}</span></div>`;
+        }
+        
+        entryHtml += `<div style="font-size: 11px; color: var(--text-dim); font-weight: 600; margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 6px;">💼 <b>Pro Exit Strategy:</b> Book 50% profit at <span style="color:var(--text-bright)">T1 (${fmt(obj.t1)})</span>, then trail Stop-Loss to Breakeven (${fmt(obj.tEntry)}).</div>`;
+        document.getElementById('tmTimeInTrade').innerHTML = entryHtml;
     } else {
         tm.style.display = 'block';
         tm.className = 'trade-manager tm-inactive';
@@ -2070,6 +2211,139 @@ async function scanMarketLeaders() {
 // Start Scanner on load and auto-refresh every 5 minutes (300000ms)
 setTimeout(scanMarketLeaders, 1000);
 setInterval(scanMarketLeaders, 300000);
+
+// ==============================
+// ACTIVE TRADE SENTINEL LOGIC
+// ==============================
+let activeTrade = null;
+let sentinelTimer = null;
+
+function openSentinelSetup() {
+    if(!activeSymbol || !mainObjMem || mainObjMem.signalType === 'HOLD') {
+        flashError("Scan a stock with a strong BUY/SELL signal first.");
+        return;
+    }
+    const overlay = document.getElementById('sentinelOverlay');
+    overlay.classList.add('active');
+    document.getElementById('sentinelSetup').style.display = 'block';
+    document.getElementById('sentinelDash').style.display = 'none';
+    
+    document.getElementById('setupSym').innerText = activeSymbol.replace('.NS','');
+    const isBuy = mainObjMem.signalType === 'BUY';
+    document.getElementById('setupSide').innerText = isBuy ? 'LONG / BUY' : 'SHORT / SELL';
+    document.getElementById('setupSide').style.background = isBuy ? 'rgba(52,211,153,0.2)' : 'rgba(248,113,113,0.2)';
+    document.getElementById('setupSide').style.color = isBuy ? 'var(--green)' : 'var(--red)';
+    document.getElementById('setupPriceInput').value = Math.round(mainObjMem.ltp * 20)/20;
+}
+
+function closeSentinel() {
+    document.getElementById('sentinelOverlay').classList.remove('active');
+    if(sentinelTimer) clearInterval(sentinelTimer);
+    activeTrade = null;
+}
+
+function startSentinelConfirmed() {
+    const p = parseFloat(document.getElementById('setupPriceInput').value);
+    if(!p || p <= 0) return flashError("Enter a valid execution price");
+    
+    activeTrade = {
+        symbol: activeSymbol,
+        entryPrice: p,
+        side: mainObjMem.signalType,
+        t1Booked: false,
+        sl: p * (mainObjMem.signalType === 'BUY' ? 0.985 : 1.015), // fallback strictly 1.5% stop
+        t1: mainObjMem.t1 || (p * (mainObjMem.signalType === 'BUY' ? 1.015 : 0.985))
+    };
+    
+    if (mainObjMem.tSL) activeTrade.sl = mainObjMem.tSL;
+    
+    document.getElementById('sentinelSetup').style.display = 'none';
+    document.getElementById('sentinelDash').style.display = 'flex';
+    document.getElementById('sentinelSym').innerText = activeTrade.symbol.replace('.NS','');
+    document.getElementById('sentinelEntryVal').innerText = fmt(p);
+    
+    runSentinelUpdate();
+    sentinelTimer = setInterval(runSentinelUpdate, 15000); // Super fast 15 sec refresh
+}
+
+async function runSentinelUpdate() {
+    if(!activeTrade) return;
+    try {
+        const rawData = await executeYahooQuery(activeTrade.symbol, '1m', '1d');
+        if(!rawData) return;
+        const res = rawData.chart.result;
+        if(!res || !res.length) return;
+        
+        const q = res[0].indicators.quote[0];
+        const closes = q.close.map(c=>c||0).filter(c=>c>0);
+        const vols = q.volume.map(v=>v||0);
+        const ltp = closes[closes.length-1];
+        if(!ltp) return;
+        
+        // Pnl
+        let pnlPct = 0;
+        if(activeTrade.side === 'BUY') {
+            pnlPct = ((ltp - activeTrade.entryPrice)/activeTrade.entryPrice)*100;
+        } else {
+            pnlPct = ((activeTrade.entryPrice - ltp)/activeTrade.entryPrice)*100;
+        }
+        
+        const pnlEl = document.getElementById('sentinelLivePnl');
+        pnlEl.innerText = (pnlPct>0?'+':'') + pnlPct.toFixed(2) + '%';
+        pnlEl.className = 'sent-pnl-val ' + (pnlPct>0?'clr-green':(pnlPct<0?'clr-red':''));
+        document.getElementById('sentinelLtp').innerText = fmt(ltp);
+        
+        // Sentinel Command Logic
+        let cmd = document.getElementById('sentinelCommand');
+        let det = document.getElementById('sentinelDetail');
+        let card = document.getElementById('sentinelStatusCard');
+        let pulse = document.getElementById('sentinelPulse');
+        
+        const isLong = activeTrade.side === 'BUY';
+        const hitTarget = isLong ? (ltp >= activeTrade.t1) : (ltp <= activeTrade.t1);
+        const hitSL = isLong ? (ltp <= activeTrade.sl) : (ltp >= activeTrade.sl);
+        const lastVol = vols[vols.length-1];
+        const avgVol = vols.slice(-10).reduce((a,b)=>a+b,0)/10;
+        
+        pulse.className = 'sent-pulse'; // Reset pulse
+        
+        if (hitSL) {
+            cmd.innerText = "🚨 BAIL OUT!";
+            det.innerText = `Stop Loss breached (${fmt(activeTrade.sl)})! Close position immediately at market to protect capital.`;
+            card.style.background = "rgba(248,113,113,0.15)";
+            card.style.borderColor = "var(--red-border)";
+            cmd.style.color = "var(--red)";
+            pulse.classList.add('sent-red');
+        } else if (pnlPct < -0.5 && lastVol > avgVol * 1.5) {
+            // Massive volume dump against the trade
+            cmd.innerText = "🚨 BAIL OUT!";
+            det.innerText = "Massive institutional volume moving against your position. Market sell immediately to avoid stop loss hit.";
+            card.style.background = "rgba(248,113,113,0.15)";
+            card.style.borderColor = "var(--red-border)";
+            cmd.style.color = "var(--red)";
+            pulse.classList.add('sent-red');
+        } else if (hitTarget || activeTrade.t1Booked) {
+            if (!activeTrade.t1Booked) activeTrade.t1Booked = true; 
+            activeTrade.sl = activeTrade.entryPrice; 
+            
+            cmd.innerText = "🎯 SECURE PROFITS";
+            det.innerText = `Book 50% profit at market if not done. Stop loss auto-trailed to breakeven ${fmt(activeTrade.sl)}.`;
+            card.style.background = "rgba(52,211,153,0.15)";
+            card.style.borderColor = "var(--green-border)";
+            cmd.style.color = "var(--green)";
+            pulse.classList.add('sent-green');
+        } else {
+            cmd.innerText = "🟢 HOLD STEADY";
+            det.innerText = "Price action is normal. Do not panic. Tracking live...";
+            card.style.background = "rgba(0,0,0,0.3)";
+            card.style.borderColor = "var(--border)";
+            cmd.style.color = "var(--text-bright)";
+        }
+        
+        document.getElementById('sentinelTs').innerText = fmt(activeTrade.sl);
+        
+    } catch(e) { console.error("Sentinel Error", e); }
+}
 
 </script>
 </body>
