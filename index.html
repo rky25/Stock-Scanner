@@ -168,6 +168,45 @@
         .stagger-8 { animation-delay: 0.4s; }
 
         /* ============================================
+           PAGES & NAVIGATION
+        ============================================ */
+        .page { display: none; width: 100%; animation: fadePage 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .page.active { display: block; }
+        @keyframes fadePage { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        .navbar {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border); display: flex; justify-content: space-around;
+            padding: 8px 12px calc(8px + var(--safe-bottom)); z-index: 1000;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            color: var(--text-dim); text-decoration: none; font-size: 10px; font-weight: 700;
+            cursor: pointer; transition: all 0.2s; padding: 6px 16px; border-radius: 12px;
+        }
+        .nav-item.active { color: var(--blue); background: rgba(129, 140, 248, 0.08); }
+        .nav-icon { font-size: 18px; margin-bottom: 2px; }
+
+        /* ============================================
+           MARKET EXPLORER TAB
+        ============================================ */
+        .market-board { padding-bottom: 80px; }
+        .market-search-wrap { position: sticky; top: 0; background: var(--bg); padding: 12px 0; z-index: 10; margin-bottom: 12px; }
+        .market-list { display: flex; flex-direction: column; gap: 8px; }
+        .market-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 16px; background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); transition: all 0.2s; cursor: pointer;
+        }
+        .market-item:active { background: var(--surface-hover); transform: scale(0.98); }
+        .m-sym { font-size: 14px; font-weight: 800; color: var(--text-bright); }
+        .m-name { font-size: 10px; color: var(--text-dim); text-transform: uppercase; }
+        .m-metrics { text-align: right; }
+        .m-price { font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums; }
+        .m-pct { font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+        /* ============================================
            HEADER
         ============================================ */
         header {
@@ -822,13 +861,31 @@
 <body>
 
 <div class="app">
-    <header>
-        <div class="logo-row">
-            <div class="logo-icon">📈</div>
-            <h1>ProScanner</h1>
+    <!-- BOTTOM NAVIGATION -->
+    <nav class="navbar">
+        <div class="nav-item active" onclick="switchPage('home', this)">
+            <span class="nav-icon">🏠</span>
+            <span>HOME</span>
         </div>
-        <div class="subtitle">AI-Powered Smart Trading Intelligence</div>
-    </header>
+        <div class="nav-item" onclick="switchPage('market', this)">
+            <span class="nav-icon">📈</span>
+            <span>MARKETS</span>
+        </div>
+        <div class="nav-item" id="navSentinel" style="display:none;" onclick="switchPage('sentinel', this)">
+            <span class="nav-icon">🛡️</span>
+            <span>SENTINEL</span>
+        </div>
+    </nav>
+
+    <!-- PAGE: HOME (SCANNER) -->
+    <div id="pageHome" class="page active">
+        <header>
+            <div class="logo-row">
+                <div class="logo-icon">📈</div>
+                <h1>ProScanner</h1>
+            </div>
+            <div class="subtitle">AI-Powered Smart Trading Intelligence</div>
+        </header>
 
     <div id="errorToast" class="error-toast"></div>
 
@@ -853,7 +910,7 @@
     <!-- ==================== MARKET LEADERS (200-500) ==================== -->
     <div class="leaders-wrap" id="leadersSection">
         <div class="leaders-head">
-            <div class="leaders-title">⚡ Momentum Leaders <span style="opacity:0.6;font-size:10px;">(₹1 - ₹1500)</span></div>
+            <div class="leaders-title">⚡ Market Momentum Leaders <span style="opacity:0.6;font-size:10px;">(All Stocks)</span></div>
             <div style="display:flex; align-items:center; gap:8px;">
                 <div class="leaders-scan-status" id="leadersStatus">Scanning...</div>
                 <button onclick="scanMarketLeaders()" style="background:none;border:none;cursor:pointer;color:var(--text-dim);font-size:14px;padding:2px;" title="Refresh Scanner">🔄</button>
@@ -1043,23 +1100,31 @@
     <footer>
         ⚠️ Algorithmic signals for educational purposes only. Trading involves substantial risk. Always do your own research.
     </footer>
+</div> <!-- END PAGE HOME -->
+
+<!-- PAGE: MARKET EXPLORER (ALL STOCKS) -->
+<div id="pageMarket" class="page market-board">
+    <div class="market-search-wrap">
+        <div style="font-size: 20px; font-weight: 900; margin-bottom: 12px; color: var(--text-bright); padding: 0 4px;">📈 Market Universe Live</div>
+        <div class="search-input-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="marketSearchInput" placeholder="Search 1500+ stocks..." autocomplete="off">
+        </div>
+    </div>
+    <div id="marketList" class="market-list">
+        <div class="loader-text" style="text-align:center; padding: 40px;">Initializing Market-Wide Heatmap...</div>
+    </div>
 </div>
 
-<!-- ==================== ACTIVE TRADE SENTINEL ==================== -->
-<div class="sentinel-overlay" id="sentinelOverlay">
-    <div class="sentinel-setup" id="sentinelSetup">
-        <button class="port-rm" onclick="closeSentinel()" style="position:absolute;top:15px;right:15px;">✖</button>
-        <div style="font-size:20px;font-weight:900;margin-bottom:20px;color:#fff;">⚔️ Live Trade Handover</div>
-        <div id="setupSym" style="font-size:36px;font-weight:900;margin-bottom:10px;">--</div>
-        <div id="setupSide" style="padding:8px 18px;border-radius:100px;background:var(--green);display:inline-block;margin-bottom:30px;font-weight:900;font-size:14px;letter-spacing:1px;">BUY MODE</div>
-        
-        <label style="display:block;margin-bottom:12px;color:var(--text-dim);font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:1px;">Enter Your Cost Basis</label>
-        <input type="number" id="setupPriceInput" step="0.05" class="sent-input" placeholder="0.00">
-        
-        <button class="sent-btn" onclick="startSentinelConfirmed()">CONFIRM & ENGAGE SENTINEL</button>
+<!-- PAGE: SENTINEL (ONLY IN TRADE) -->
+<div id="pageSentinel" class="page">
+    <div id="sentinelDashPlaceholder" style="text-align:center; padding: 100px 20px; color: var(--text-dim);">
+        <div style="font-size: 40px; margin-bottom: 20px;">🛡️</div>
+        <div style="font-weight: 800;">No Active Trade</div>
+        <p style="font-size: 12px; margin-top: 10px;">Logging a trade on the Home page will activate the Live Sentinel Dashboard here.</p>
     </div>
 
-    <div class="sentinel-dash" id="sentinelDash" style="display:none;">
+    <div class="sentinel-dash" id="sentinelDash" style="display:none; padding-bottom: 80px;">
         <div class="sent-head">
             <div class="sent-pulse" id="sentinelPulse"></div> Active Sentinel Engine
             <button class="port-rm" onclick="closeSentinel()" style="margin-left:auto;color:#fff;background:rgba(255,255,255,0.1);border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;">✖</button>
@@ -1079,6 +1144,21 @@
             <div class="sent-metrics-box"><label>Current LTP</label><span id="sentinelLtp">--</span></div>
             <div class="sent-metrics-box"><label>Trailing SL</label><span id="sentinelTs">--</span></div>
         </div>
+    </div>
+</div>
+
+<!-- ==================== ACTIVE TRADE SETUP OVERLAY ==================== -->
+<div class="sentinel-overlay" id="sentinelOverlay">
+    <div class="sentinel-setup" id="sentinelSetup">
+        <button class="port-rm" onclick="closeSentinel()" style="position:absolute;top:15px;right:15px;">✖</button>
+        <div style="font-size:20px;font-weight:900;margin-bottom:20px;color:#fff;">⚔️ Live Trade Handover</div>
+        <div id="setupSym" style="font-size:36px;font-weight:900;margin-bottom:10px;">--</div>
+        <div id="setupSide" style="padding:8px 18px;border-radius:100px;background:var(--green);display:inline-block;margin-bottom:30px;font-weight:900;font-size:14px;letter-spacing:1px;">BUY MODE</div>
+        
+        <label style="display:block;margin-bottom:12px;color:var(--text-dim);font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:1px;">Enter Your Cost Basis</label>
+        <input type="number" id="setupPriceInput" step="0.05" class="sent-input" placeholder="0.00">
+        
+        <button class="sent-btn" onclick="startSentinelConfirmed()">CONFIRM & ENGAGE SENTINEL</button>
     </div>
 </div>
 
@@ -1106,6 +1186,28 @@ const fmtShort = (n) => parseFloat(n).toFixed(2);
 let activeSymbol = null, mainSignalMem = null, mainObjMem = null;
 let tvChart = null, candleSeries = null, line1Series = null, line2Series = null, upperSeries = null, lowerSeries = null;
 let portfolio = new Set(), portfolioSignals = {};
+let marketData = []; // Store Nifty 500 results for filtering
+
+function switchPage(pageId, navItem) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page' + pageId.charAt(0).toUpperCase() + pageId.slice(1)).classList.add('active');
+    
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    navItem.classList.add('active');
+
+    // Special: Force chart resize if returning to home
+    if(pageId === 'home' && tvChart) {
+        setTimeout(() => {
+            const ct = document.getElementById('chartContainer');
+            tvChart.applyOptions({ width: ct.clientWidth, height: ct.clientHeight });
+        }, 100);
+    }
+    
+    // Auto-scan markets if entering market page first time
+    if(pageId === 'market' && marketData.length === 0) {
+        scanMarketLeaders();
+    }
+}
 
 try { const saved = JSON.parse(localStorage.getItem('scannerPortfolio') || '[]'); saved.forEach(s => portfolio.add(s)); } catch(e) {}
 function savePortfolio() { localStorage.setItem('scannerPortfolio', JSON.stringify([...portfolio])); }
@@ -1123,6 +1225,7 @@ function updateMarketStatus() {
     const now = new Date();
     const ist = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + (3600000 * 5.5));
     const t = ist.getHours() + ist.getMinutes() / 60;
+    // Market opens at 9:15 AM (9.25)
     const open = ist.getDay() >= 1 && ist.getDay() <= 5 && t >= 9.25 && t <= 15.5;
     DOM.marketStatus.innerHTML = open
         ? '<span style="color:var(--green)">● Market Open — Live</span>'
@@ -1136,6 +1239,9 @@ if ("Notification" in window && Notification.permission !== "granted" && Notific
 // FETCHING
 // ==============================
 async function fetchData(sym, intv = '1m', rng = '1d') {
+    // For 1m interval, we fetch at least 2d to cover market open gap and prime indicators
+    if (intv === '1m' && rng === '1d') rng = '2d';
+    
     const urls = [
         `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=${intv}&range=${rng}`,
         `https://query2.finance.yahoo.com/v8/finance/chart/${sym}?interval=${intv}&range=${rng}`
@@ -1182,10 +1288,35 @@ function calcEMA(d,p){const r=new Array(d.length).fill(null),k=2/(p+1);let s=0,c
 function calcRSI(d,p){const r=new Array(d.length).fill(null);let g=0,l=0;for(let i=1;i<=p;i++){const di=d[i]-d[i-1];if(di>0)g+=di;else l+=Math.abs(di);}g/=p;l/=p;r[p]=100-(100/(1+(g/(l||1e-10))));for(let i=p+1;i<d.length;i++){const di=d[i]-d[i-1],gi=di>0?di:0,li=di<0?Math.abs(di):0;g=(g*(p-1)+gi)/p;l=(l*(p-1)+li)/p;r[i]=100-(100/(1+(g/(l||1e-10))));}return r;}
 function calcMACD(d,f,s,sig){const eF=calcEMA(d,f),eS=calcEMA(d,s),macd=new Array(d.length).fill(null);let vI=-1;for(let i=0;i<d.length;i++)if(eS[i]!==null){macd[i]=eF[i]-eS[i];if(vI===-1)vI=i;}const signal=new Array(d.length).fill(null);if(vI>=0){const se=calcEMA(macd.slice(vI),sig);for(let i=0;i<se.length;i++)signal[vI+i]=se[i];}const histogram=new Array(d.length).fill(null);for(let i=0;i<d.length;i++)if(macd[i]!==null&&signal[i]!==null)histogram[i]=macd[i]-signal[i];return{macd,signal,histogram};}
 function calcBollinger(d,p,std){const m=calcSMA(d,p),u=new Array(d.length).fill(null),l=new Array(d.length).fill(null);for(let i=p-1;i<d.length;i++){let s=0;for(let j=0;j<p;j++)s+=Math.pow(d[i-j]-m[i],2);const sD=Math.sqrt(s/p);u[i]=m[i]+std*sD;l[i]=m[i]-std*sD;}return{middle:m,upper:u,lower:l};}
-function calcVWAP(h,l,c,v){const vw=new Array(h.length).fill(null);let cV=0,cT=0;for(let i=0;i<h.length;i++){const tp=(h[i]+l[i]+c[i])/3;cV+=v[i];cT+=tp*v[i];vw[i]=cV>0?(cT/cV):tp;}return vw;}
+function calcVWAP(h,l,c,v,t){
+    const vw=new Array(h.length).fill(null);
+    let cV=0,cT=0,lastDay=-1;
+    for(let i=0;i<h.length;i++){
+        if(t && t[i]){
+            const dt = new Date(t[i]*1000).getDate();
+            if(dt !== lastDay){ cV=0; cT=0; lastDay=dt; } // Reset every new trading day
+        }
+        const tp=(h[i]+l[i]+c[i])/3;
+        cV+=v[i];
+        cT+=tp*v[i];
+        vw[i]=cV>0?(cT/cV):tp;
+    }
+    return vw;
+}
 function calcATR(h,l,c,p){const atr=new Array(h.length).fill(null),tr=new Array(h.length).fill(null);for(let i=1;i<h.length;i++)tr[i]=Math.max(h[i]-l[i],Math.abs(h[i]-c[i-1]),Math.abs(l[i]-c[i-1]));let s=0;for(let i=1;i<=p;i++)if(tr[i]!=null)s+=tr[i];atr[p]=s/p;for(let i=p+1;i<h.length;i++)atr[i]=(atr[i-1]*(p-1)+tr[i])/p;return atr;}
 function calcADX(h,l,c,p){const n=h.length;if(n<p*2)return new Array(n).fill(null);const pDM=new Array(n).fill(0),mDM=new Array(n).fill(0),tr=new Array(n).fill(0);for(let i=1;i<n;i++){const uM=h[i]-h[i-1],dM=l[i-1]-l[i];if(uM>dM&&uM>0)pDM[i]=uM;if(dM>uM&&dM>0)mDM[i]=dM;tr[i]=Math.max(h[i]-l[i],Math.abs(h[i]-c[i-1]),Math.abs(l[i]-c[i-1]));}let sTR=0,sP=0,sM=0;for(let i=1;i<=p;i++){sTR+=tr[i];sP+=pDM[i];sM+=mDM[i];}if(sTR===0)return new Array(n).fill(null);const pDI=new Array(n).fill(null),mDI=new Array(n).fill(null),dx=new Array(n).fill(null),adx=new Array(n).fill(null);pDI[p]=(sP/sTR)*100;mDI[p]=(sM/sTR)*100;dx[p]=Math.abs(pDI[p]-mDI[p])/((pDI[p]+mDI[p])||1)*100;for(let i=p+1;i<n;i++){sTR=sTR-(sTR/p)+tr[i];sP=sP-(sP/p)+pDM[i];sM=sM-(sM/p)+mDM[i];pDI[i]=(sP/sTR)*100;mDI[i]=(sM/sTR)*100;const den=pDI[i]+mDI[i];dx[i]=den===0?0:Math.abs(pDI[i]-mDI[i])/den*100;}let dxS=0;for(let i=p;i<p*2;i++)dxS+=(dx[i]||0);adx[p*2-1]=dxS/p;for(let i=p*2;i<n;i++)adx[i]=((adx[i-1]*(p-1))+(dx[i]||0))/p;return adx;}
-function calcOBV(c,v){const obv=new Array(c.length).fill(0);for(let i=1;i<c.length;i++){if(c[i]>c[i-1])obv[i]=obv[i-1]+v[i];else if(c[i]<c[i-1])obv[i]=obv[i-1]-v[i];else obv[i]=obv[i-1];}return obv;}
+function calcOBV(c,v,t){
+    const obv=new Array(c.length).fill(0);
+    let lastDay=-1;
+    for(let i=1;i<c.length;i++){
+        if(t && t[i]){
+            const dt=new Date(t[i]*1000).getDate();
+            if(dt !== lastDay){ obv[i]=v[i]; lastDay=dt; continue; } // Contextual reset
+        }
+        if(c[i]>c[i-1])obv[i]=obv[i-1]+v[i];else if(c[i]<c[i-1])obv[i]=obv[i-1]-v[i];else obv[i]=obv[i-1];
+    }
+    return obv;
+}
 function calcMFI(h,l,c,v,p){const mfi=new Array(h.length).fill(null),tp=[],mf=[0];for(let i=0;i<h.length;i++)tp.push((h[i]+l[i]+c[i])/3);for(let i=1;i<h.length;i++)mf.push(tp[i]*v[i]);const pmf=new Array(h.length).fill(0),nmf=new Array(h.length).fill(0);for(let i=1;i<h.length;i++){if(tp[i]>tp[i-1])pmf[i]=mf[i];else nmf[i]=mf[i];}for(let i=p;i<h.length;i++){let pS=0,nS=0;for(let j=0;j<p;j++){pS+=pmf[i-j];nS+=nmf[i-j];}mfi[i]=100-(100/(1+(pS/(nS||1e-10))));}return mfi;}
 
 function calcSupertrend(h,l,c,p=10,factor=3){const atr=calcATR(h,l,c,p),n=c.length,st=new Array(n).fill(null),dir=new Array(n).fill(1),ub=new Array(n).fill(null),lb=new Array(n).fill(null);for(let i=p;i<n;i++){if(atr[i]===null)continue;const hl2=(h[i]+l[i])/2;let bU=hl2+factor*atr[i],bL=hl2-factor*atr[i];ub[i]=(ub[i-1]!==null&&bU<ub[i-1]&&c[i-1]>ub[i-1])?ub[i-1]:bU;lb[i]=(lb[i-1]!==null&&bL>lb[i-1]&&c[i-1]<lb[i-1])?lb[i-1]:bL;if(i===p){dir[i]=c[i]>ub[i]?1:-1;}else{const pd=dir[i-1];if(pd===1)dir[i]=c[i]<lb[i]?-1:1;else dir[i]=c[i]>ub[i]?1:-1;}st[i]=dir[i]===1?lb[i]:ub[i];}return{st,dir};}
@@ -1611,17 +1742,20 @@ async function getAlgorithmData(sym) {
     const closes=[],opens=[],highs=[],lows=[],vols=[],times=[];
     const q=cd.indicators.quote[0];
     for(let i=0;i<cd.timestamp.length;i++){if(q.close[i]!==null){closes.push(q.close[i]);opens.push(q.open[i]);highs.push(q.high[i]);lows.push(q.low[i]);vols.push(q.volume[i]);times.push(cd.timestamp[i]);}}
-    if(closes.length<50)throw new Error("Too few candles.");
+    
+    // Minimum 50 candles required for accurate indicator calculation (EMAs/RSI)
+    // On 1m chart, we now fetch 2d history, so this will always be met unless ticker is new.
+    if(closes.length<40)throw new Error(`Insufficient data for ${sym} (Found ${closes.length} candles, need 40+).`);
 
     const len=closes.length,ltp=closes[len-1];
     const ema9=calcEMA(closes,9),ema21=calcEMA(closes,21);
     const rsiArr=calcRSI(closes,14);
     const{macd,signal:macdSig,histogram:macdHist}=calcMACD(closes,12,26,9);
     const{middle:bbMid,upper:bbUp,lower:bbLo}=calcBollinger(closes,20,2);
-    const vwapArr=calcVWAP(highs,lows,closes,vols);
+    const vwapArr=calcVWAP(highs,lows,closes,vols,times);
     const atrArr=calcATR(highs,lows,closes,14);
     const adxArr=calcADX(highs,lows,closes,14);
-    const obvArr=calcOBV(closes,vols);
+    const obvArr=calcOBV(closes,vols,times);
     const mfiArr=calcMFI(highs,lows,closes,vols,14);
     const{st:supertrend,dir:stDir}=calcSupertrend(highs,lows,closes,10,3);
     const{k:stochK,d:stochD}=calcStochRSI(closes,14,14,3,3);
@@ -2047,32 +2181,44 @@ window.removePortfolio=removePortfolio;
 function renderPortfolioCard(obj){DOM.portSection.style.display='block';const sid='port-'+obj.sym.replace('.','_');let el=document.getElementById(sid);const ar=(obj.change||0)>=0?'▲':'▼',cc=(obj.change||0)>=0?'clr-green':'clr-red';const sc={BUY:{bg:'var(--green-bg)',b:'var(--green-border)',c:'var(--green)'},SELL:{bg:'var(--red-bg)',b:'var(--red-border)',c:'var(--red)'}};const s=sc[obj.signalType]||{bg:'var(--amber-bg)',b:'var(--amber-border)',c:'var(--amber)'};
 const html=`<button class="port-rm" onclick="event.stopPropagation();removePortfolio('${obj.sym}')">×</button><div class="port-sym">${obj.sym.replace('.NS','')}</div><div class="port-price">${obj.ltp.toString().includes('₹')?obj.ltp:fmt(obj.ltp)}</div><div style="font-size:11px;margin-bottom:6px;" class="${cc}">${ar} ${Math.abs(obj.change||0).toFixed(2)} (${Math.abs(obj.pChange||0).toFixed(2)}%)</div><div class="port-sig" style="background:${s.bg};border:1px solid ${s.b};color:${s.c};"><span>${obj.signalType}</span><span style="font-weight:400;font-size:9px;opacity:0.7;"> ${obj.grade||''} ${obj.conf||0}%</span></div>`;
 if(el){el.innerHTML=html;}else{const d=document.createElement('div');d.className='port-item';d.id=sid;d.innerHTML=html;d.onclick=()=>{DOM.symbolInput.value=obj.sym.replace('.NS','');analyzeInput();};DOM.portGrid.appendChild(d);}}
-
 setInterval(async()=>{for(const s of portfolio){try{const o=await getAlgorithmData(s);renderPortfolioCard(o);if(portfolioSignals[s]!==undefined&&portfolioSignals[s]!==o.signalType){if("Notification"in window&&Notification.permission==="granted")new Notification(`🚨 ${o.signalType}: ${s.replace('.NS','')}`,{body:`${o.signalType} at ${fmt(o.ltp)}`});}portfolioSignals[s]=o.signalType;}catch(e){}}},60000);
 
 setInterval(async()=>{if(activeSymbol&&DOM.resultCard.style.display!=='none'){document.getElementById('rTime').innerText='Refreshing...';try{const o=await getAlgorithmData(activeSymbol);renderMainCard(o,true);}catch(e){}}},30000);
 
 if(portfolio.size>0){DOM.portSection.style.display='block';portfolio.forEach(sym=>renderPortfolioCard({sym,ltp:'...',signalType:'SYNC',grade:'--',pChange:0,change:0,conf:0}));setTimeout(async()=>{for(const sym of portfolio){try{const o=await getAlgorithmData(sym);renderPortfolioCard(o);portfolioSignals[sym]=o.signalType;}catch(e){}}},2000);}
-// ==============================
-// MARKET LEADERS SCANNER (200-500)
-// ==============================
+
 const SCANNER_POOL = [
-    "RELIANCE","TCS","INFY","HDFCBANK","ICICIBANK","SBIN","TATAMOTORS","ITC","LARSEN","BAJFINANCE","BHARTIARTL",
-    "AXISBANK","KOTAKBANK","ASIANPAINT","M&M","HCLTECH","SUNPHARMA","TITAN","WIPRO","NTPC","POWERGRID","JSWSTEEL",
-    "TATASTEEL","ADANIPORTS","HINDALCO","ONGC","COALINDIA","GRASIM","TECHM","CIPLA","HINDUNILVR","DRREDDY",
-    "MARUTI","ULTRACEMCO","BAJAJFINSV","NESTLEIND","EICHERMOT","BPCL","HEROMOTOCO","DIVISLAB","TATAASIA",
-    "PVRINOX","BHEL","BEL","HAL","RVNL","IRFC","JIOFIN","SUZLON","ZOMATO","PAYTM","NYKAA",
-    "AWL","ADANIENT","ADANIGREEN","TATAPOWER","INDIGO","IOC","NMDC","SAIL","PNB","BANKBARODA",
-    "CANBK","UNIONBANK","INDIANB","IDFCFIRSTB","YESBANK","RECLTD","PFC","GAIL","HINDPETRO","AMBUJACEM",
-    "ACC","SHREECEM","VEDL","BOSCHLTD","MRF","APOLLOHOSP","TORNTPHARM","BIOCON","LUPIN","AUROPHARMA",
-    "PEL","MOTHERSON","TVSMOTOR","ASHOKLEY","ESCORTS","MCDOWELL-N","UBL","IGL","MGL","PETRONET",
-    "CONCOR","IRCTC","HAVELLS","VOLTAS","DIXON","POLYCAB","KEI","ASTRAL","BATAINDIA","CUMMINSIND",
-    "LTTS","LTIM","PERSISTENT","MPHASIS","COFORGE","BSOFT","TATACOMM","NAUKRI","ICICIGI","HDFCLIFE",
-    "SBILIFE","MAXHEALTH","SYNGENE","CROMPTON","PAGEIND","SRF","NAVINFLUOR","DEEPAKNTR","PIIND",
-    "TRENT","JINDALSTEL","MUTHOOTFIN","CHOLAFIN","SRTRANSFIN","M&MFIN","MANAPPURAM","LICI","ABBOTINDIA",
-    "GMRINFRA","TRIDENT","IDEA","YESBANK","IDBI","BANKINDIA","CENTRALBK","UCOBANK","IOB","MAHABANK",
-    "IRB","SUNDARMFIN","PNBHOUSING","LICHSGFIN","CANFINHOME","ABCAPITAL","ABFRL","ZEEL","SUNTV","PVRINOX"
+    "RELIANCE", "TCS", "HDFCBANK", "ICICIBANK", "BHARTIARTL", "INFY", "SBIN", "LICI", "ITC", "HINDUNILVR", 
+    "LT", "BAJFINANCE", "ADANIENT", "HCLTECH", "ADANIPORTS", "KOTAKBANK", "AXISBANK", "TITAN", "SUNPHARMA", "MARUTI", 
+    "POWERGRID", "ULTRACEMCO", "NTPC", "TATASTEEL", "JSWSTEEL", "M&M", "LTIND", "BAJAJFINSV", "ADANIGREEN", "ADANIPOWER", 
+    "GRASIM", "HINDALCO", "ADANITRANS", "WIPRO", "COALINDIA", "NESTLEIND", "SBILIFE", "HDFCLIFE", "BPCL", "ONGC", 
+    "DRREDDY", "CIPLA", "JSWENERGY", "EICHERMOT", "BRITANNIA", "DIVISLAB", "TATACONSUM", "TECHM", "APOLLOHOSP", "BAJAJ-AUTO", 
+    "HEROMOTOCO", "INDUSINDBK", "SHREECEM", "RVNL", "IRFC", "IREDA", "SUZLON", "ZOMATO", "BEL", "HAL", 
+    "YESBANK", "IDFCFIRSTB", "PNB", "BANKBARODA", "UNIONBANK", "CANBK", "INDIANB", "IOB", "MAHABANK", "CENTRALBK", 
+    "UCOBANK", "PSB", "MAHINDCIE", "LTIM", "PERSISTENT", "COFORGE", "MPHASIS", "KPITTECH", "TATACOMM", "BSOFT", 
+    "DIXON", "POLYCAB", "KEI", "HAVELLS", "VGUARD", "CROMPTON", "AMBER", "BLUESTARCO", "VOLTAS", "ABB", 
+    "SIEMENS", "CUMMINSIND", "THERMAX", "HONAUT", "SKFINDIA", "SCHAEFFLER", "AIAENG", "TIMKEN", "TRITURBINE", "KIRLOSENG", 
+    "CONCOR", "GMDCLTD", "NMDC", "SAIL", "HINDZINC", "JINDALSTEL", "JSL", "RATNAMANI", "GRAPHITE", "HEG", 
+    "NATIONALUM", "PEL", "MOTILALOFS", "ANGELONE", "ISEC", "CDSL", "BSE", "MCX", "MUTHOOTFIN", "RECLTD", 
+    "PFC", "HUDCO", "NHPC", "SJVN", "TATAPOWER", "TORNTPOWER", "CESC", "ADANIENSOL", "GUJGASLTD", "IGL", 
+    "MGL", "PETRONET", "OIL", "CPCL", "MRPL", "HINDPETRO", "IOC", "AMBUJACEM", "ACC", "DALBHARAT", 
+    "JKCEMENT", "JKTYRE", "CEATLTD", "APOLLOTYRE", "MRF", "BALKRISIND", "PRESTIGE", "DLF", "OBEROIRLTY", "LODHA", 
+    "PHOENIXLTD", "GODREJPROP", "BRIGADE", "SOBHA", "SUNTECK", "KOLTEPATIL", "ASHOKA", "KNRCON", "PNCINFRA", "NCC", 
+    "FLUOROCHEM", "SRF", "AARTIIND", "VINATIORGA", "DEEPAKNTR", "NAVINFLUOR", "ATUL", "PIDILITIND", "COROMANDEL", "PIIND", 
+    "UPL", "SUMICHEM", "BAYERCROP", "DABUR", "COLPAL", "MARICO", "GODREJCP", "VBL", "DEVYANI", "SAPPPHIRE", 
+    "WESTLIFE", "JUBILANT", "TRENT", "ABFRL", "NYKAA", "PAGEIND", "BATAINDIA", "RELAXO", "METROBRAND", "KALYANKJIL", 
+    "JOYALUKKAS", "RAJESHEXPO", "MAXHEALTH", "FORTIS", "GLOBAL", "RAINBOW", "ASTERDM", "KIMS", "MEDANTA", "YATHARTH", 
+    "NARAYANA", "SHALBY", "LUPIN", "AUROPHARMA", "GLENMARK", "ZYDUSLIFE", "ALKEM", "BIOCON", "SYNGENE", "LAURUSLABS", 
+    "GLAND", "GRANULES", "JBCHEPHARM", "ERIS", "IPCALAB", "NATCOPHARM", "AJANTPHARM", "FDC", "MARKSANS", "SEQUENT", 
+    "GNA", "RKFORGE", "SONACOMS", "UNOMINDA", "MINDACORP", "CRAFTSMAN", "SANSERA", "TALBROAUTO", "SJS", "VARROC", 
+    "LUMAXTECH", "MAHSEAMLES", "TUBEINVEST", "ASHOKLEY", "ESCORTS", "TVSMOTOR", "TATAMOTORS", "PAYTM", "POLICYBZR", "DELHIVERY", 
+    "CARTRADE", "MAPMYINDIA", "CEINFO", "LTTS", "TATAELXSI", "KPIITTECH", "ORIENTELEC", "SYMPHONY", "BAJAJELEC", "USHA", 
+    "RRKABEL", "TDPS", "BHEL", "CONTI", "TCI", "TCEXP", "MAHLOG", "BLUEDART", "GATEWAY", "VESUVIUS", 
+    "RHIM", "CERA", "KAJARIACER", "SOMANYCERS", "ASTRAL", "PRINCEPIPE", "SUPREMEIND", "FINPIPE", "GFL", "TORNTPHARM", 
+    "INDIAMART", "AFFLE", "TANLA", "ROUTE", "NAZARA", "EASEMYTRIP"
 ];
+
+const SCANNER_POOL_NSE = SCANNER_POOL.map(s => s.endsWith('.NS') ? s : s + '.NS');
 
 async function scanMarketLeaders() {
     const listBullish = document.getElementById('listBullish');
@@ -2080,20 +2226,25 @@ async function scanMarketLeaders() {
     const statusText = document.getElementById('leadersStatus');
     const progCont = document.getElementById('scanProgressCont');
     const progBar = document.getElementById('scanProgressBar');
+    const marketList = document.getElementById('marketList');
     
-    progCont.style.display = 'block';
-    statusText.innerText = '1/2: Checking 150 Stocks...';
-    statusText.style.background = 'rgba(99,102,241,0.1)';
-    statusText.style.color = 'var(--blue)';
+    if (progCont) progCont.style.display = 'block';
+    if (statusText) {
+        statusText.innerText = `1/2: Checking ${SCANNER_POOL_NSE.length} Stocks...`;
+        statusText.style.background = 'rgba(99,102,241,0.1)';
+        statusText.style.color = 'var(--blue)';
+    }
     
-    // ----------- STAGE 1: BULK SCAN -----------
-    const BATCH_SIZE = 40;
+    // ----------- STAGE 1: BULK SCAN (Sequential Throttled) -----------
+    const BATCH_SIZE = 50; 
     const allValidStocks = [];
-    
-    for (let i = 0; i < SCANNER_POOL.length; i += BATCH_SIZE) {
-        const chunk = SCANNER_POOL.slice(i, i + BATCH_SIZE);
-        const syms = chunk.map(s => s + '.NS').join(',');
+
+    for (let i = 0; i < SCANNER_POOL_NSE.length; i += BATCH_SIZE) {
+        const chunk = SCANNER_POOL_NSE.slice(i, i + BATCH_SIZE);
+        const syms = chunk.join(',');
         const url = `https://query1.finance.yahoo.com/v8/finance/spark?symbols=${syms}&range=1d&interval=1d`;
+        
+        if (statusText) statusText.innerText = `1/2: Live [${allValidStocks.length} Found]`;
         
         try {
             const proxies = [
@@ -2102,22 +2253,16 @@ async function scanMarketLeaders() {
                 `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
                 url
             ];
-            
             let data = null;
             for (const p of proxies) {
                 try {
-                    const res = await fetch(p, { signal: AbortSignal.timeout(5000) });
+                    const res = await fetch(p, { signal: AbortSignal.timeout(6000) });
                     if (res.ok) {
                         const json = await res.json();
-                        const firstSym = chunk[0] + '.NS';
-                        if (json && json[firstSym]) {
-                            data = json;
-                            break;
-                        }
+                        if (json) { data = json; break; }
                     }
                 } catch(e) {}
             }
-            
             if (data) {
                 Object.keys(data).forEach(sym => {
                     const obj = data[sym];
@@ -2125,73 +2270,56 @@ async function scanMarketLeaders() {
                         const p = obj.close[obj.close.length - 1];
                         const prev = obj.chartPreviousClose || p;
                         const pct = prev > 0 ? ((p - prev) / prev) * 100 : 0;
-                        if (p >= 1 && p <= 1500) {
-                            allValidStocks.push({ sym: obj.symbol || sym, price: p, pct });
-                        }
+                        allValidStocks.push({ sym: sym.replace('.NS',''), price: p, pct });
                     }
                 });
             }
         } catch(e) {}
         
-        progBar.style.width = Math.round(((i + BATCH_SIZE) / SCANNER_POOL.length) * 50) + '%';
+        // Small delay between batches to respect proxy rate limits
+        await new Promise(r => setTimeout(r, 200));
+        if (progBar) progBar.style.width = Math.round(((i + BATCH_SIZE) / SCANNER_POOL_NSE.length) * 50) + '%';
     }
     
+    // Sort all stocks by percentage move (highest to lowest) before saving
+    allValidStocks.sort((a,b) => b.pct - a.pct);
+    
+    marketData = allValidStocks; // Save for filtering
+    renderMarketList(); // Populate the new Market Board
+
     if (allValidStocks.length === 0) {
-        progCont.style.display = 'none';
-        listBullish.innerHTML = '<div class="leader-empty">No stocks found in range</div>';
-        listBearish.innerHTML = '<div class="leader-empty">No stocks found in range</div>';
-        statusText.innerText = 'Checked 150 (None found)';
+        if (progCont) progCont.style.display = 'none';
         return;
     }
     
-    allValidStocks.sort((a,b) => b.pct - a.pct);
-    const positiveStocks = allValidStocks.filter(s => s.pct >= 0);
-    const negativeStocks = allValidStocks.filter(s => s.pct < 0).reverse();
-    
-    // Shortlist top 8 gainers and top 8 losers for deep scan
-    const shortList = [...positiveStocks.slice(0, 8), ...negativeStocks.slice(0, 8)];
+    const shortList = [...allValidStocks.slice(0, 8), ...allValidStocks.slice(-8)];
     
     // ----------- STAGE 2: DEEP ALGO SCAN -----------
-    statusText.innerText = `2/2: Deep Analyzing ${shortList.length} leads...`;
+    if (statusText) statusText.innerText = `2/2: Confirming leads...`;
     const finalBullish = [];
     const finalBearish = [];
     
     for (let i = 0; i < shortList.length; i++) {
         try {
-            const symRaw = shortList[i].sym.replace('.NS', '');
-            // Run exactly the same full algorithm engine secretly
-            const algoData = await getAlgorithmData(symRaw + '.NS');
-            
-            if (algoData.signalType === 'BUY') {
-                finalBullish.push({
-                    sym: symRaw, price: shortList[i].price, pct: shortList[i].pct,
-                    conf: algoData.conf, grade: algoData.grade, score: algoData.score
-                });
-            } else if (algoData.signalType === 'SELL') {
-                finalBearish.push({
-                    sym: symRaw, price: shortList[i].price, pct: shortList[i].pct,
-                    conf: algoData.conf, grade: algoData.grade, score: algoData.score
-                });
+            const algoData = await getAlgorithmData(shortList[i].sym + '.NS');
+            if (algoData.signalType === 'BUY' && algoData.conf > 50) {
+                finalBullish.push({ ...shortList[i], conf: algoData.conf, grade: algoData.grade, score: algoData.score });
+            } else if (algoData.signalType === 'SELL' && algoData.conf > 50) {
+                finalBearish.push({ ...shortList[i], conf: algoData.conf, grade: algoData.grade, score: algoData.score });
             }
         } catch(e) {}
-        
-        progBar.style.width = Math.round(50 + ((i + 1) / shortList.length) * 50) + '%';
+        if (progBar) progBar.style.width = Math.round(50 + ((i + 1) / shortList.length) * 50) + '%';
     }
     
-    progCont.style.display = 'none';
-    
-    // Sort mathematically mathematically by algorithmic confluence score
+    if (progCont) progCont.style.display = 'none';
     finalBullish.sort((a,b) => b.score - a.score);
     finalBearish.sort((a,b) => a.score - b.score);
     
-    const topGainers = finalBullish.slice(0, 5);
-    const topLosers = finalBearish.slice(0, 5);
-    
-    const renderItem = (item, isUp) => `
-        <li class="leader-item" onclick="DOM.symbolInput.value='${item.sym}'; analyzeInput();">
+    const renderLeader = (item, isUp) => `
+        <li class="leader-item" onclick="launchAnalysis('${item.sym}')">
             <div>
-                <div class="leader-sym">${item.sym} <span style="font-size:10px; opacity:0.8; margin-left:4px;" class="${isUp?'clr-green':'clr-red'}">${item.grade} (${item.conf}%)</span></div>
-                <div class="leader-action">${isUp ? 'Strong Buy Confirmed' : 'Strong Sell Confirmed'}</div>
+                <div class="leader-sym">${item.sym} <span class="${isUp?'clr-green':'clr-red'}" style="font-size:10px;">${item.grade}</span></div>
+                <div class="leader-action">${item.conf}% Confidence</div>
             </div>
             <div class="leader-metrics">
                 <div class="leader-price">${fmt(item.price)}</div>
@@ -2200,17 +2328,52 @@ async function scanMarketLeaders() {
         </li>
     `;
     
-    listBullish.innerHTML = topGainers.length ? topGainers.map(item => renderItem(item, true)).join('') : '<div class="leader-empty">No High-Confidence Buys</div>';
-    listBearish.innerHTML = topLosers.length ? topLosers.map(item => renderItem(item, false)).join('') : '<div class="leader-empty">No High-Confidence Sells</div>';
-    
-    statusText.innerText = `Analyzed ${shortList.length} potentials`;
-    statusText.style.background = 'rgba(52,211,153,0.1)';
-    statusText.style.color = 'var(--green)';
+    if (listBullish) listBullish.innerHTML = finalBullish.length ? finalBullish.slice(0, 5).map(item => renderLeader(item, true)).join('') : '<div class="leader-empty">No Bullish Breakouts</div>';
+    if (listBearish) listBearish.innerHTML = finalBearish.length ? finalBearish.slice(0, 5).map(item => renderLeader(item, false)).join('') : '<div class="leader-empty">No Bearish Breakdowns</div>';
+    if (statusText) { statusText.innerText = `Markets Online`; statusText.style.color = 'var(--green)'; }
 }
 
-// Start Scanner on load and auto-refresh every 5 minutes (300000ms)
-setTimeout(scanMarketLeaders, 1000);
-setInterval(scanMarketLeaders, 300000);
+function renderMarketList(filter = '') {
+    const list = document.getElementById('marketList');
+    if (!list) return;
+    
+    // Filter and also ensure sorting is maintained (Highest % move on top)
+    const filtered = marketData
+        .filter(s => s.sym.toLowerCase().includes(filter.toLowerCase()))
+        .sort((a, b) => b.pct - a.pct);
+        
+    if (filtered.length === 0) {
+        list.innerHTML = `<div class="leader-empty">No stocks matching "${filter}"</div>`;
+        return;
+    }
+
+    list.innerHTML = filtered.map(s => `
+        <div class="market-item" onclick="launchAnalysis('${s.sym}')">
+            <div>
+                <div class="m-sym">${s.sym}</div>
+                <div class="m-name">NSE India</div>
+            </div>
+            <div class="m-metrics">
+                <div class="m-price">${fmt(s.price)}</div>
+                <div class="m-pct ${s.pct>=0?'clr-green':'clr-red'}">${s.pct>=0?'▲':'▼'} ${Math.abs(s.pct).toFixed(2)}%</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function launchAnalysis(sym) {
+    const symNSE = sym.endsWith('.NS') ? sym : sym + '.NS';
+    DOM.symbolInput.value = sym.replace('.NS','');
+    switchPage('home', document.querySelectorAll('.nav-item')[0]);
+    analyzeInput();
+}
+
+// Add Search Listener for Market Board
+document.getElementById('marketSearchInput')?.addEventListener('input', e => {
+    renderMarketList(e.target.value.trim());
+});
+
+// Cleanup
 
 // ==============================
 // ACTIVE TRADE SENTINEL LOGIC
@@ -2240,6 +2403,10 @@ function closeSentinel() {
     document.getElementById('sentinelOverlay').classList.remove('active');
     if(sentinelTimer) clearInterval(sentinelTimer);
     activeTrade = null;
+    document.getElementById('navSentinel').style.display = 'none';
+    document.getElementById('sentinelDashPlaceholder').style.display = 'block';
+    document.getElementById('sentinelDash').style.display = 'none';
+    switchPage('home', document.querySelectorAll('.nav-item')[0]);
 }
 
 function startSentinelConfirmed() {
@@ -2251,25 +2418,30 @@ function startSentinelConfirmed() {
         entryPrice: p,
         side: mainObjMem.signalType,
         t1Booked: false,
-        sl: p * (mainObjMem.signalType === 'BUY' ? 0.985 : 1.015), // fallback strictly 1.5% stop
+        sl: p * (mainObjMem.signalType === 'BUY' ? 0.985 : 1.015), 
         t1: mainObjMem.t1 || (p * (mainObjMem.signalType === 'BUY' ? 1.015 : 0.985))
     };
     
     if (mainObjMem.tSL) activeTrade.sl = mainObjMem.tSL;
     
-    document.getElementById('sentinelSetup').style.display = 'none';
-    document.getElementById('sentinelDash').style.display = 'flex';
+    document.getElementById('sentinelOverlay').classList.remove('active');
+    document.getElementById('navSentinel').style.display = 'flex';
+    document.getElementById('sentinelDashPlaceholder').style.display = 'none';
+    document.getElementById('sentinelDash').style.display = 'block';
+    
     document.getElementById('sentinelSym').innerText = activeTrade.symbol.replace('.NS','');
     document.getElementById('sentinelEntryVal').innerText = fmt(p);
     
+    switchPage('sentinel', document.getElementById('navSentinel'));
+    
     runSentinelUpdate();
-    sentinelTimer = setInterval(runSentinelUpdate, 15000); // Super fast 15 sec refresh
+    sentinelTimer = setInterval(runSentinelUpdate, 15000); 
 }
 
 async function runSentinelUpdate() {
     if(!activeTrade) return;
     try {
-        const rawData = await executeYahooQuery(activeTrade.symbol, '1m', '1d');
+        const rawData = await fetchData(activeTrade.symbol, '1m', '1d'); // Use our proxy-wrapped fetchData
         if(!rawData) return;
         const res = rawData.chart.result;
         if(!res || !res.length) return;
@@ -2280,7 +2452,6 @@ async function runSentinelUpdate() {
         const ltp = closes[closes.length-1];
         if(!ltp) return;
         
-        // Pnl
         let pnlPct = 0;
         if(activeTrade.side === 'BUY') {
             pnlPct = ((ltp - activeTrade.entryPrice)/activeTrade.entryPrice)*100;
@@ -2293,7 +2464,6 @@ async function runSentinelUpdate() {
         pnlEl.className = 'sent-pnl-val ' + (pnlPct>0?'clr-green':(pnlPct<0?'clr-red':''));
         document.getElementById('sentinelLtp').innerText = fmt(ltp);
         
-        // Sentinel Command Logic
         let cmd = document.getElementById('sentinelCommand');
         let det = document.getElementById('sentinelDetail');
         let card = document.getElementById('sentinelStatusCard');
@@ -2305,19 +2475,18 @@ async function runSentinelUpdate() {
         const lastVol = vols[vols.length-1];
         const avgVol = vols.slice(-10).reduce((a,b)=>a+b,0)/10;
         
-        pulse.className = 'sent-pulse'; // Reset pulse
+        pulse.className = 'sent-pulse';
         
         if (hitSL) {
             cmd.innerText = "🚨 BAIL OUT!";
-            det.innerText = `Stop Loss breached (${fmt(activeTrade.sl)})! Close position immediately at market to protect capital.`;
+            det.innerText = `Stop Loss breached (${fmt(activeTrade.sl)})! Close position immediately.`;
             card.style.background = "rgba(248,113,113,0.15)";
             card.style.borderColor = "var(--red-border)";
             cmd.style.color = "var(--red)";
             pulse.classList.add('sent-red');
         } else if (pnlPct < -0.5 && lastVol > avgVol * 1.5) {
-            // Massive volume dump against the trade
             cmd.innerText = "🚨 BAIL OUT!";
-            det.innerText = "Massive institutional volume moving against your position. Market sell immediately to avoid stop loss hit.";
+            det.innerText = "Institutional volume dumping. Exit now to protect capital.";
             card.style.background = "rgba(248,113,113,0.15)";
             card.style.borderColor = "var(--red-border)";
             cmd.style.color = "var(--red)";
@@ -2325,25 +2494,26 @@ async function runSentinelUpdate() {
         } else if (hitTarget || activeTrade.t1Booked) {
             if (!activeTrade.t1Booked) activeTrade.t1Booked = true; 
             activeTrade.sl = activeTrade.entryPrice; 
-            
             cmd.innerText = "🎯 SECURE PROFITS";
-            det.innerText = `Book 50% profit at market if not done. Stop loss auto-trailed to breakeven ${fmt(activeTrade.sl)}.`;
+            det.innerText = `Book 50%. SL trailed to breakeven ${fmt(activeTrade.sl)}.`;
             card.style.background = "rgba(52,211,153,0.15)";
             card.style.borderColor = "var(--green-border)";
             cmd.style.color = "var(--green)";
             pulse.classList.add('sent-green');
         } else {
             cmd.innerText = "🟢 HOLD STEADY";
-            det.innerText = "Price action is normal. Do not panic. Tracking live...";
+            det.innerText = "Normal price action. Sentinel is tracking live...";
             card.style.background = "rgba(0,0,0,0.3)";
             card.style.borderColor = "var(--border)";
             cmd.style.color = "var(--text-bright)";
         }
-        
         document.getElementById('sentinelTs').innerText = fmt(activeTrade.sl);
-        
     } catch(e) { console.error("Sentinel Error", e); }
 }
+
+// Initial Kickoff
+setTimeout(scanMarketLeaders, 1000);
+setInterval(scanMarketLeaders, 15000); // Efficient 15s market-wide refresh
 
 </script>
 </body>
