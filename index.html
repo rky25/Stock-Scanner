@@ -597,12 +597,59 @@
             padding: 3px 10px; border-radius: var(--radius-xs);
             font-size: 10px; font-weight: 900;
         }
-        .port-rm {
-            position: absolute; top: 12px; right: 14px; background: none;
-            border: none; color: var(--text-dim); font-size: 18px; cursor: pointer;
-            transition: all 0.2s; padding: 4px; line-height: 1;
+        .port-rm { position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 14px; color: var(--text-dim); cursor: pointer; padding: 4px; }
+
+        .leader-sym-box { display: flex; align-items: center; gap: 6px; }
+        .leader-grade-badge {
+            font-size: 9px; font-weight: 900; background: rgba(255,255,255,0.1);
+            color: var(--text-dim); padding: 1px 5px; border-radius: 4px;
+            letter-spacing: 0.5px;
         }
-        .port-rm:active { color: var(--red); transform: scale(1.2); }
+
+        /* ============================================
+           TRADER'S BRAIN: CONFLUENCE DASHBOARD
+        ============================================ */
+        .confluence-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 10px;
+            animation: scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.08s both;
+        }
+        .conf-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            text-align: center;
+        }
+        .conf-lbl {
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .conf-val {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--text-bright);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .conf-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+        .conf-dot.bull { background: var(--green); box-shadow: 0 0 8px var(--green); }
+        .conf-dot.bear { background: var(--red); box-shadow: 0 0 8px var(--red); }
+        .conf-dot.neutral { background: var(--amber); }
 
         /* ============================================
            FOOTER
@@ -966,6 +1013,9 @@
             </div>
             <div class="sig-right" id="rConfidence"></div>
         </div>
+
+        <!-- NEW: Trader's Brain Confluence Dashboard -->
+        <div class="confluence-grid" id="confluenceGrid"></div>
 
         <!-- AI: Regime Badge + Session Bar -->
         <div class="regime-badge-wrap" id="regimeBadgeWrap" style="display:none;">
@@ -1409,16 +1459,42 @@ const AdaptiveWeights = {
         return weightedScore;
     },
     autoLearn(sym, indicatorResults, closes) {
-        // Auto-learn from recent price action: check if last 5 candle direction matches indicator predictions
         const n = closes.length;
         if(n < 10) return this.getWeights(sym);
         const recentMove = (closes[n-1] - closes[n-5]) / closes[n-5] * 100;
         const bullInd = Object.values(indicatorResults).filter(v => v.signal === 'BUY').length;
         const bearInd = Object.values(indicatorResults).filter(v => v.signal === 'SELL').length;
         const majorityBull = bullInd > bearInd;
-        const priceUp = recentMove > 0.1;
+        const priceUp = recentMove > 0.05;
         const outcome = (majorityBull && priceUp) || (!majorityBull && !priceUp) ? 'correct' : 'incorrect';
         return this.learn(sym, indicatorResults, outcome);
+    }
+};
+
+// ==============================
+// TRADER'S BRAIN: CONFLUENCE ENGINE
+// ==============================
+const ConfluenceEngine = {
+    getRelativeStrength(closes, niftyCloses) {
+        if (!closes || !niftyCloses || closes.length < 15 || niftyCloses.length < 15) return 0;
+        const sRet = (closes[closes.length-1] - closes[closes.length-15]) / closes[closes.length-15] * 100;
+        const nRet = (niftyCloses[niftyCloses.length-1] - niftyCloses[niftyCloses.length-15]) / niftyCloses[niftyCloses.length-15] * 100;
+        return sRet - nRet; // Positive means leading the market
+    },
+    getBarrierStatus(ltp, pivots) {
+        if (!pivots) return { status: 'CLEAR', dist: 99 };
+        const barriers = [
+            { name: 'R2', val: pivots.r2 },
+            { name: 'R1', val: pivots.r1 },
+            { name: 'Pivot', val: pivots.pivot },
+            { name: 'S1', val: pivots.s1 },
+            { name: 'S2', val: pivots.s2 }
+        ];
+        for (const b of barriers) {
+            const dist = Math.abs(ltp - b.val) / ltp * 100;
+            if (dist < 0.25) return { name: b.name, dist, status: 'NEAR' };
+        }
+        return { status: 'CLEAR', dist: 99 };
     }
 };
 
@@ -1815,32 +1891,59 @@ async function getAlgorithmData(sym) {
     let adaptedWeights = AdaptiveWeights.autoLearn(sym, ir, closes);
     let algoScore = AdaptiveWeights.applyWeights(ir, adaptedWeights);
 
-    let niftyText='Neutral';
-    if(niftyData&&!niftyData.chart?.error&&sym!=='^NSEI.NS'){const nQ=niftyData.chart.result[0].indicators.quote[0],nc=[];for(let i=0;i<nQ.close.length;i++)if(nQ.close[i]!==null)nc.push(nQ.close[i]);if(nc.length>30){const nR=calcRSI(nc,14),nV=nR[nR.length-1];if(nV>60){algoScore+=12;niftyText='Bullish';}else if(nV<40){algoScore-=12;niftyText='Bearish';}}}
+    // TRADER'S BRAIN LAYER 1: Market Relative Strength
+    let niftyText='Neutral', rsScore = 0;
+    if(niftyData&&!niftyData.chart?.error&&sym!=='^NSEI.NS'){
+        const nQ=niftyData.chart.result[0].indicators.quote[0],nc=[];
+        for(let i=0;i<nQ.close.length;i++) if(nQ.close[i]!==null) nc.push(nQ.close[i]);
+        if(nc.length > 30){
+            const rs = ConfluenceEngine.getRelativeStrength(closes, nc);
+            if(rs > 0.15) { algoScore += 15; niftyText = 'Leading Market'; rsScore = 1; }
+            else if(rs < -0.15) { algoScore -= 15; niftyText = 'Lagging Market'; rsScore = -1; }
+            else { niftyText = 'Tracking Market'; }
+        }
+    }
 
-    let newsText='Neutral',nScore=0;
-    if(newsData?.news?.length>0){const pos=['growth','profit','surge','up','buy','bullish','high','record','deal','win','gains','positive','upgrade','jump','beat','rally','strong','rise'];const neg=['loss','fall','down','crash','bearish','sued','fraud','low','miss','sell','downgrade','plunge','negative','debt','breach','fine','weak','decline','drop'];newsData.news.forEach(n=>{const t=(n.title||'').toLowerCase();pos.forEach(w=>{if(t.includes(w))nScore++;});neg.forEach(w=>{if(t.includes(w))nScore--;});});if(nScore>2){algoScore+=8;newsText='Positive';}else if(nScore<-2){algoScore-=8;newsText='Negative';}}
-
-    // Apply Regime & Session Multipliers
-    algoScore *= (regimeData.scoreMultiplier || 1.0);
-    if(Math.abs(algoScore) > 20) algoScore *= (sessionData.multiplier || 1.0);
-
-    let signalType='HOLD',grade='C';
-    const buyC=Object.values(ir).filter(v=>v.signal==='BUY').length,sellC=Object.values(ir).filter(v=>v.signal==='SELL').length,totalI=Object.keys(ir).length;
-    
-    // AI 5: Smart Confidence Generation
+    // TRADER'S BRAIN LAYER 2: Barrier Gating
     const pivots=calcPivotLevels(dailyData);
+    const barrier = ConfluenceEngine.getBarrierStatus(ltp, pivots);
+
+    // TRADER'S BRAIN LAYER 3: Strict MTF Trend Guard
+    const mtfAlignment = mtfScore > 30 ? 'BULL' : mtfScore < -30 ? 'BEAR' : 'MIXED';
+    
+    let signalType='HOLD',grade='C', convictionMsg = 'Wait for Setup';
+    const buyC=Object.values(ir).filter(v=>v.signal==='BUY').length;
+    const sellC=Object.values(ir).filter(v=>v.signal==='SELL').length;
+    
+    // FINAL DECISION MATRIX
+    if(algoScore >= 50 && buyC >= 6) {
+        if(mtfAlignment === 'BEAR') {
+            signalType = 'HOLD'; convictionMsg = 'TRAP: Conflicting MTF Trend';
+        } else if(barrier.status === 'NEAR' && ['R1','R2'].includes(barrier.name)) {
+            signalType = 'HOLD'; convictionMsg = `WAIT: Near Resistance ${barrier.name}`;
+        } else {
+            signalType = 'BUY';
+            convictionMsg = mtfAlignment === 'BULL' ? 'HIGH SURETY: Trend Aligned' : 'Normal Buy (Scalp)';
+        }
+    } else if(algoScore <= -50 && sellC >= 6) {
+        if(mtfAlignment === 'BULL') {
+            signalType = 'HOLD'; convictionMsg = 'TRAP: Conflicting MTF Trend';
+        } else if(barrier.status === 'NEAR' && ['S1','S2'].includes(barrier.name)) {
+            signalType = 'HOLD'; convictionMsg = `WAIT: Near Support ${barrier.name}`;
+        } else {
+            signalType = 'SELL';
+            convictionMsg = mtfAlignment === 'BEAR' ? 'HIGH SURETY: Trend Aligned' : 'Normal Sell (Scalp)';
+        }
+    }
+
+    if(signalType === 'BUY') grade = algoScore >= 75 ? 'A+' : 'A';
+    else if(signalType === 'SELL') grade = algoScore <= -75 ? 'A+' : 'A';
+
+    // AI 5: Smart Confidence Generation
     const confData = calcSignalConfidence(ltp, vwap, pivots, stDir[len-1], obvArr, mfiArr, closes, vols, bbUp, bbLo);
     let conf = confData.confidence;
-    
-    // Final classification
-    if(algoScore>=75&&buyC>=8){signalType='BUY';grade='A+';conf=Math.min(99,conf+15);}
-    else if(algoScore>=50&&buyC>=6){signalType='BUY';grade='A';conf=Math.min(90,conf+10);}
-    else if(algoScore>=35&&buyC>=4){signalType='BUY';grade='B';conf=Math.min(80,conf+5);}
-    else if(algoScore<=-75&&sellC>=8){signalType='SELL';grade='A+';conf=Math.min(99,conf+15);}
-    else if(algoScore<=-50&&sellC>=6){signalType='SELL';grade='A';conf=Math.min(90,conf+10);}
-    else if(algoScore<=-35&&sellC>=4){signalType='SELL';grade='B';conf=Math.min(80,conf+5);}
-    else{signalType='HOLD';grade='C';conf=Math.max(20,50-Math.abs(algoScore));}
+    if(mtfAlignment === (signalType === 'BUY' ? 'BULL' : 'BEAR')) conf = Math.min(99, conf + 15);
+    if(signalType === 'HOLD') conf = 35;
 
     // AI 2: Pro Trader Entry & Exit Engine
     const lastOpen = opens[len-1], lastHigh = highs[len-1], lastLow = lows[len-1], lastClose = closes[len-1];
@@ -1920,7 +2023,8 @@ async function getAlgorithmData(sym) {
         SignalHistory.addSignal(sym, signalType, grade, ltp, conf);
     }
 
-    return{sym,signalType,grade,conf,confBreakdown:confData.breakdown,regimeData,sessionData,tradePlan,ltp,change,pChange,tEntry,entryMsg,entryType,tSL,t1,t2,rr,trailing,reversal,momentumScore,score:algoScore,vwap,atr,dADX,cRsi,mfi,cSK,cSD,cROC,cWR,cSTDir,cSarDir,indicatorResults:ir,candlePatterns,bbSqueeze,rsiDiv,mtfText,niftyText,newsText,buyCount:buyC,sellCount:sellC,totalIndicators:totalI,pivots,isOpening:sessionData.name==='Opening Rush',closes,opens,highs,lows,times,vols,ema9,vwapArr,bbUp,bbLo,supertrend,stDir,sar,sarDir,pivotLine:pivots?.pivot,r1:pivots?.r1,s1:pivots?.s1,r2:pivots?.r2,s2:pivots?.s2};
+    return{sym,signalType,grade,conf,convictionMsg,barrier,mtfAlignment,rsScore,confBreakdown:confData.breakdown,regimeData,sessionData,tradePlan,ltp,change,pChange,tEntry,entryMsg,entryType,tSL,t1,t2,rr,trailing,reversal,momentumScore,score:algoScore,vwap,atr,dADX,cRsi,mfi,cSK,cSD,cROC,cWR,cSTDir,cSarDir,indicatorResults:ir,candlePatterns,bbSqueeze,rsiDiv,mtfText,niftyText,newsText,buyCount:buyC,sellCount:sellC,totalIndicators:totalI,pivots,isOpening:sessionData.name==='Opening Rush',closes,opens,highs,lows,times,vols,ema9,vwapArr,bbUp,bbLo,supertrend,stDir,sar,sarDir,pivotLine:pivots?.pivot,r1:pivots?.r1,s1:pivots?.s1,r2:pivots?.r2,s2:pivots?.s2};
+}
 }
 
 // ==============================
@@ -2137,6 +2241,29 @@ function renderMainCard(obj,isSilent){
     nar+=`News: ${obj.newsText}`;
     document.getElementById('rAnalysisText').innerHTML=nar;
 
+    // Trader's Brain Confluence Panel
+    const cp = document.getElementById('confluenceGrid');
+    if(cp) {
+        const getDot = (st) => st === 'BULL' ? 'bull' : st === 'BEAR' ? 'bear' : 'neutral';
+        cp.innerHTML = `
+            <div class="conf-item">
+                <div class="conf-lbl">Trend Alignment</div>
+                <div class="conf-val"><div class="conf-dot ${getDot(obj.mtfAlignment)}"></div> ${obj.mtfAlignment}</div>
+            </div>
+            <div class="conf-item">
+                <div class="conf-lbl">Market Leader</div>
+                <div class="conf-val"><div class="conf-dot ${obj.rsScore>0?'bull':obj.rsScore<0?'bear':'neutral'}"></div> ${obj.niftyText}</div>
+            </div>
+            <div class="conf-item">
+                <div class="conf-lbl">Barrier Status</div>
+                <div class="conf-val"><div class="conf-dot ${obj.barrier.status==='CLEAR'?'bull':'bear'}"></div> ${obj.barrier.status==='NEAR'?obj.barrier.name:'Clear'}</div>
+            </div>
+            <div class="conf-item" style="grid-column: span 3; margin-top: 8px; text-align: center; border-top: 1px solid var(--border); padding-top: 8px;">
+                <div style="font-size: 11px; font-weight: 600; color: var(--text-bright);">${obj.convictionMsg}</div>
+            </div>
+        `;
+    }
+
     DOM.resultCard.style.display='block';
     updateTVChart(obj);
 }
@@ -2181,9 +2308,9 @@ window.removePortfolio=removePortfolio;
 function renderPortfolioCard(obj){DOM.portSection.style.display='block';const sid='port-'+obj.sym.replace('.','_');let el=document.getElementById(sid);const ar=(obj.change||0)>=0?'▲':'▼',cc=(obj.change||0)>=0?'clr-green':'clr-red';const sc={BUY:{bg:'var(--green-bg)',b:'var(--green-border)',c:'var(--green)'},SELL:{bg:'var(--red-bg)',b:'var(--red-border)',c:'var(--red)'}};const s=sc[obj.signalType]||{bg:'var(--amber-bg)',b:'var(--amber-border)',c:'var(--amber)'};
 const html=`<button class="port-rm" onclick="event.stopPropagation();removePortfolio('${obj.sym}')">×</button><div class="port-sym">${obj.sym.replace('.NS','')}</div><div class="port-price">${obj.ltp.toString().includes('₹')?obj.ltp:fmt(obj.ltp)}</div><div style="font-size:11px;margin-bottom:6px;" class="${cc}">${ar} ${Math.abs(obj.change||0).toFixed(2)} (${Math.abs(obj.pChange||0).toFixed(2)}%)</div><div class="port-sig" style="background:${s.bg};border:1px solid ${s.b};color:${s.c};"><span>${obj.signalType}</span><span style="font-weight:400;font-size:9px;opacity:0.7;"> ${obj.grade||''} ${obj.conf||0}%</span></div>`;
 if(el){el.innerHTML=html;}else{const d=document.createElement('div');d.className='port-item';d.id=sid;d.innerHTML=html;d.onclick=()=>{DOM.symbolInput.value=obj.sym.replace('.NS','');analyzeInput();};DOM.portGrid.appendChild(d);}}
-setInterval(async()=>{for(const s of portfolio){try{const o=await getAlgorithmData(s);renderPortfolioCard(o);if(portfolioSignals[s]!==undefined&&portfolioSignals[s]!==o.signalType){if("Notification"in window&&Notification.permission==="granted")new Notification(`🚨 ${o.signalType}: ${s.replace('.NS','')}`,{body:`${o.signalType} at ${fmt(o.ltp)}`});}portfolioSignals[s]=o.signalType;}catch(e){}}},60000);
+setInterval(async()=>{for(const s of portfolio){try{const o=await getAlgorithmData(s);renderPortfolioCard(o);if(portfolioSignals[s]!==undefined&&portfolioSignals[s]!==o.signalType){if("Notification"in window&&Notification.permission==="granted")new Notification(`🚨 ${o.signalType}: ${s.replace('.NS','')}`,{body:`${o.signalType} at ${fmt(o.ltp)}`});}portfolioSignals[s]=o.signalType;}catch(e){}}},15000);
 
-setInterval(async()=>{if(activeSymbol&&DOM.resultCard.style.display!=='none'){document.getElementById('rTime').innerText='Refreshing...';try{const o=await getAlgorithmData(activeSymbol);renderMainCard(o,true);}catch(e){}}},30000);
+setInterval(async()=>{if(activeSymbol&&DOM.resultCard.style.display!=='none'){document.getElementById('rTime').innerText='Refreshing...';try{const o=await getAlgorithmData(activeSymbol);renderMainCard(o,true);}catch(e){}}},15000);
 
 if(portfolio.size>0){DOM.portSection.style.display='block';portfolio.forEach(sym=>renderPortfolioCard({sym,ltp:'...',signalType:'SYNC',grade:'--',pChange:0,change:0,conf:0}));setTimeout(async()=>{for(const sym of portfolio){try{const o=await getAlgorithmData(sym);renderPortfolioCard(o);portfolioSignals[sym]=o.signalType;}catch(e){}}},2000);}
 
@@ -2235,51 +2362,51 @@ async function scanMarketLeaders() {
         statusText.style.color = 'var(--blue)';
     }
     
-    // ----------- STAGE 1: BULK SCAN (Sequential Throttled) -----------
+    // ----------- STAGE 1: BULK SCAN (Parallel Optimized) -----------
     const BATCH_SIZE = 50; 
     const allValidStocks = [];
+    const fetchPromises = [];
 
     for (let i = 0; i < SCANNER_POOL_NSE.length; i += BATCH_SIZE) {
         const chunk = SCANNER_POOL_NSE.slice(i, i + BATCH_SIZE);
         const syms = chunk.join(',');
         const url = `https://query1.finance.yahoo.com/v8/finance/spark?symbols=${syms}&range=1d&interval=1d`;
         
-        if (statusText) statusText.innerText = `1/2: Live [${allValidStocks.length} Found]`;
-        
-        try {
-            const proxies = [
-                `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
-                `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-                `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
-                url
-            ];
-            let data = null;
-            for (const p of proxies) {
-                try {
-                    const res = await fetch(p, { signal: AbortSignal.timeout(6000) });
-                    if (res.ok) {
-                        const json = await res.json();
-                        if (json) { data = json; break; }
-                    }
-                } catch(e) {}
-            }
-            if (data) {
-                Object.keys(data).forEach(sym => {
-                    const obj = data[sym];
-                    if (obj && obj.close && obj.close.length > 0) {
-                        const p = obj.close[obj.close.length - 1];
-                        const prev = obj.chartPreviousClose || p;
-                        const pct = prev > 0 ? ((p - prev) / prev) * 100 : 0;
-                        allValidStocks.push({ sym: sym.replace('.NS',''), price: p, pct });
-                    }
-                });
-            }
-        } catch(e) {}
-        
-        // Small delay between batches to respect proxy rate limits
-        await new Promise(r => setTimeout(r, 200));
-        if (progBar) progBar.style.width = Math.round(((i + BATCH_SIZE) / SCANNER_POOL_NSE.length) * 50) + '%';
+        fetchPromises.push((async () => {
+            try {
+                const proxies = [
+                    `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
+                    `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+                    `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+                    url
+                ];
+                let data = null;
+                for (const p of proxies) {
+                    try {
+                        const res = await fetch(p, { signal: AbortSignal.timeout(6000) });
+                        if (res.ok) {
+                            const json = await res.json();
+                            if (json) { data = json; break; }
+                        }
+                    } catch(e) {}
+                }
+                if (data) {
+                    Object.keys(data).forEach(sym => {
+                        const obj = data[sym];
+                        if (obj && obj.close && obj.close.length > 0) {
+                            const p = obj.close[obj.close.length - 1];
+                            const prev = obj.chartPreviousClose || p;
+                            const pct = prev > 0 ? ((p - prev) / prev) * 100 : 0;
+                            allValidStocks.push({ sym: sym.replace('.NS',''), price: p, pct });
+                        }
+                    });
+                }
+            } catch(e) {}
+        })());
     }
+
+    await Promise.all(fetchPromises);
+    if (progBar) progBar.style.width = '50%';
     
     // Sort all stocks by percentage move (highest to lowest) before saving
     allValidStocks.sort((a,b) => b.pct - a.pct);
@@ -2294,43 +2421,51 @@ async function scanMarketLeaders() {
     
     const shortList = [...allValidStocks.slice(0, 8), ...allValidStocks.slice(-8)];
     
-    // ----------- STAGE 2: DEEP ALGO SCAN -----------
-    if (statusText) statusText.innerText = `2/2: Confirming leads...`;
+    // ----------- STAGE 2: DEEP ALGO SCAN (Brain Synchronized) -----------
+    if (statusText) statusText.innerText = `2/2: Brain-Checking Leads...`;
     const finalBullish = [];
     const finalBearish = [];
     
     for (let i = 0; i < shortList.length; i++) {
         try {
             const algoData = await getAlgorithmData(shortList[i].sym + '.NS');
-            if (algoData.signalType === 'BUY' && algoData.conf > 50) {
-                finalBullish.push({ ...shortList[i], conf: algoData.conf, grade: algoData.grade, score: algoData.score });
-            } else if (algoData.signalType === 'SELL' && algoData.conf > 50) {
-                finalBearish.push({ ...shortList[i], conf: algoData.conf, grade: algoData.grade, score: algoData.score });
+            // High-Conviction gating: Must have a valid signal and >60% confidence
+            if (algoData.signalType === 'BUY' && algoData.conf > 60) {
+                finalBullish.push({ ...shortList[i], ...algoData });
+            } else if (algoData.signalType === 'SELL' && algoData.conf > 60) {
+                finalBearish.push({ ...shortList[i], ...algoData });
             }
         } catch(e) {}
         if (progBar) progBar.style.width = Math.round(50 + ((i + 1) / shortList.length) * 50) + '%';
     }
     
+    if (progBar) progBar.style.width = '100%';
     if (progCont) progCont.style.display = 'none';
-    finalBullish.sort((a,b) => b.score - a.score);
-    finalBearish.sort((a,b) => a.score - b.score);
+    
+    // Sort strictly by percentage move
+    finalBullish.sort((a,b) => b.pct - a.pct);
+    finalBearish.sort((a,b) => a.pct - b.pct);
     
     const renderLeader = (item, isUp) => `
         <li class="leader-item" onclick="launchAnalysis('${item.sym}')">
-            <div>
-                <div class="leader-sym">${item.sym} <span class="${isUp?'clr-green':'clr-red'}" style="font-size:10px;">${item.grade}</span></div>
-                <div class="leader-action">${item.conf}% Confidence</div>
+            <div class="leader-sym-box">
+                <div class="leader-sym">${item.sym}</div>
+                <div class="leader-grade-badge" style="color:${isUp?'var(--green)':'var(--red)'}">${item.grade}</div>
             </div>
             <div class="leader-metrics">
                 <div class="leader-price">${fmt(item.price)}</div>
-                <div class="leader-pct ${isUp ? 'up' : 'down'}">${isUp ? '▲' : '▼'} ${Math.abs(item.pct).toFixed(2)}%</div>
+                <div class="leader-pct ${isUp ? 'clr-green' : 'clr-red'}">${isUp ? '▲' : '▼'} ${Math.abs(item.pct).toFixed(2)}%</div>
             </div>
         </li>
     `;
     
-    if (listBullish) listBullish.innerHTML = finalBullish.length ? finalBullish.slice(0, 5).map(item => renderLeader(item, true)).join('') : '<div class="leader-empty">No Bullish Breakouts</div>';
-    if (listBearish) listBearish.innerHTML = finalBearish.length ? finalBearish.slice(0, 5).map(item => renderLeader(item, false)).join('') : '<div class="leader-empty">No Bearish Breakdowns</div>';
-    if (statusText) { statusText.innerText = `Markets Online`; statusText.style.color = 'var(--green)'; }
+    listBearish.innerHTML = finalBearish.length ? finalBearish.slice(0, 5).map(item => renderLeader(item, false)).join('') : '<div class="leader-empty">No Bearish Breakdowns</div>';
+    
+    if (statusText) { 
+        statusText.innerText = `Brain Scan Complete`; 
+        statusText.style.color = 'var(--green)'; 
+    }
+}
 }
 
 function renderMarketList(filter = '') {
