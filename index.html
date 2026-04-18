@@ -2420,6 +2420,261 @@
             display: flex;
             animation: fadeIn 0.2s ease forwards;
         }
+
+        /* ============================================
+           LONG-TERM AI FORECAST MODULE — CSS
+        ============================================ */
+
+        /* ── Long-Term Forecast Card ───────────────────────────────────── */
+        .lt-trigger-wrap {
+            display: none;
+            margin-top: 14px;
+            margin-bottom: 4px;
+        }
+
+        .lt-trigger-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px 20px;
+            border-radius: var(--radius);
+            border: 1.5px solid rgba(192, 132, 252, 0.35);
+            background: linear-gradient(135deg,
+                rgba(99, 102, 241, 0.08) 0%,
+                rgba(192, 132, 252, 0.12) 100%);
+            color: var(--purple);
+            font-family: var(--font);
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 0.6px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .lt-trigger-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent 0%, rgba(192,132,252,0.06) 50%, transparent 100%);
+            background-size: 200% 100%;
+            animation: shimmer 3s infinite;
+        }
+        .lt-trigger-btn:hover {
+            border-color: rgba(192, 132, 252, 0.6);
+            background: linear-gradient(135deg,
+                rgba(99, 102, 241, 0.15) 0%,
+                rgba(192, 132, 252, 0.2) 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 24px rgba(192, 132, 252, 0.2);
+        }
+        .lt-trigger-btn:active { transform: scale(0.98); }
+        .lt-trigger-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .lt-loading {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 24px 0 8px;
+            text-align: center;
+        }
+        .lt-loading-spinner {
+            width: 28px;
+            height: 28px;
+            border: 2px solid rgba(192, 132, 252, 0.12);
+            border-top: 2px solid var(--purple);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        .lt-loading-text {
+            font-size: 12px;
+            color: var(--text-dim);
+            font-weight: 500;
+        }
+        .lt-loading-step {
+            font-size: 10px;
+            color: rgba(192, 132, 252, 0.6);
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .lt-forecast-card {
+            display: none;
+            border: 1px solid rgba(192, 132, 252, 0.18);
+            border-radius: var(--radius);
+            background: linear-gradient(145deg, rgba(15, 23, 42, 0.7) 0%, rgba(26, 15, 42, 0.5) 100%);
+            backdrop-filter: blur(20px);
+            overflow: hidden;
+            margin-top: 12px;
+            animation: scaleIn 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .lt-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 18px 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            background: rgba(192, 132, 252, 0.04);
+        }
+        .lt-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--text-bright);
+            letter-spacing: 0.2px;
+        }
+        .lt-title span:first-child { font-size: 16px; }
+        .lt-subtitle {
+            font-size: 10px;
+            color: var(--text-dim);
+            font-weight: 500;
+            padding: 0 18px 10px;
+            letter-spacing: 0.3px;
+        }
+        .lt-bias-badge {
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+        .lt-bias-bullish { background: var(--green-bg); border: 1px solid var(--green-border); color: var(--green); }
+        .lt-bias-bearish { background: var(--red-bg); border: 1px solid var(--red-border); color: var(--red); }
+        .lt-bias-neutral { background: var(--amber-bg); border: 1px solid var(--amber-border); color: var(--amber); }
+        .lt-thesis {
+            padding: 10px 18px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--purple);
+            font-style: italic;
+            line-height: 1.5;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .lt-targets-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            padding: 14px 12px;
+            gap: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .lt-target {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            padding: 10px 8px;
+            border-radius: var(--radius-sm);
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.04);
+            position: relative;
+        }
+        .lt-target-main {
+            background: rgba(192, 132, 252, 0.06);
+            border-color: rgba(192, 132, 252, 0.2);
+        }
+        .lt-target-main::before {
+            content: 'KEY';
+            position: absolute;
+            top: -8px;
+            font-size: 8px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            background: var(--purple);
+            color: #0f0a1e;
+            padding: 1px 6px;
+            border-radius: 10px;
+        }
+        .lt-target-label { font-size: 9px; font-weight: 700; color: var(--text-dim); letter-spacing: 0.8px; text-transform: uppercase; }
+        .lt-target-price { font-size: 15px; font-weight: 900; color: var(--text-bright); font-variant-numeric: tabular-nums; }
+        .lt-target-pct { font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums; }
+        .lt-metrics-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            padding: 12px 12px 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .lt-metric {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 8px 10px;
+            background: rgba(255,255,255,0.02);
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .lt-metric-label { font-size: 9px; font-weight: 700; color: var(--text-dim); letter-spacing: 0.6px; text-transform: uppercase; }
+        .lt-metric-value { font-size: 11px; font-weight: 800; color: var(--text-bright); }
+        .lt-metric-bar-wrap { height: 3px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; margin-top: 2px; }
+        .lt-metric-bar { height: 100%; border-radius: 2px; transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .lt-zones-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .lt-zone-box { display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; border-radius: var(--radius-sm); }
+        .lt-zone-entry { background: rgba(52, 211, 153, 0.05); border: 1px solid rgba(52, 211, 153, 0.15); }
+        .lt-zone-sl { background: rgba(248, 113, 113, 0.05); border: 1px solid rgba(248, 113, 113, 0.15); }
+        .lt-zone-label { font-size: 9px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; }
+        .lt-zone-entry .lt-zone-label { color: var(--green); }
+        .lt-zone-sl .lt-zone-label { color: var(--red); }
+        .lt-zone-val { font-size: 13px; font-weight: 900; color: var(--text-bright); font-variant-numeric: tabular-nums; }
+        .lt-intel-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .lt-intel-box { padding: 10px 12px; border-radius: var(--radius-sm); font-size: 11px; font-weight: 600; line-height: 1.5; color: var(--text); }
+        .lt-risk-box { background: rgba(248, 113, 113, 0.06); border: 1px solid rgba(248, 113, 113, 0.15); }
+        .lt-catalyst-box { background: rgba(52, 211, 153, 0.06); border: 1px solid rgba(52, 211, 153, 0.15); }
+        .lt-intel-icon { display: block; font-size: 13px; margin-bottom: 4px; }
+        .lt-intel-label { font-size: 9px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 3px; display: block; }
+        .lt-risk-box .lt-intel-label { color: var(--red); }
+        .lt-catalyst-box .lt-intel-label { color: var(--green); }
+        .lt-narrative {
+            padding: 14px 18px;
+            font-size: 12px;
+            color: var(--text);
+            line-height: 1.65;
+            font-weight: 500;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            background: rgba(255,255,255,0.01);
+        }
+        .lt-conf-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 18px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .lt-conf-label { font-size: 10px; font-weight: 700; color: var(--text-dim); letter-spacing: 0.5px; white-space: nowrap; min-width: 90px; }
+        .lt-conf-bar-wrap { flex: 1; height: 5px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+        .lt-conf-bar { height: 100%; border-radius: 3px; transition: width 1s cubic-bezier(0.16, 1, 0.3, 1); background: linear-gradient(90deg, var(--blue), var(--purple)); }
+        .lt-conf-val { font-size: 12px; font-weight: 900; color: var(--blue); min-width: 36px; text-align: right; }
+        .lt-quality-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 18px 14px; }
+        .lt-quality-label { font-size: 10px; color: var(--text-dim); font-weight: 600; }
+        .lt-quality-badge { font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: 10px; letter-spacing: 0.6px; }
+        .lt-quality-strong { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+        .lt-quality-moderate { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+        .lt-quality-weak { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+        .lt-disclaimer { padding: 10px 18px 14px; font-size: 9px; color: rgba(100, 116, 139, 0.7); font-weight: 500; letter-spacing: 0.2px; line-height: 1.5; text-align: center; }
+        .lt-error { padding: 20px 18px; text-align: center; font-size: 12px; color: var(--red); font-weight: 600; }
+        .lt-error-icon { font-size: 24px; margin-bottom: 8px; display: block; }
+
     </style>
 </head>
 
@@ -2680,6 +2935,136 @@
                     </div>
                     <div class="sh-list" id="shList"></div>
                 </div>
+
+                <!-- ====== LONG-TERM AI FORECAST MODULE ====== -->
+     ================================================================ -->
+
+<!-- LT Forecast Trigger + Card -->
+<div class="lt-trigger-wrap animate-fade-up" id="ltTriggerWrap">
+
+    <!-- Trigger Button -->
+    <button class="lt-trigger-btn" id="ltTriggerBtn" onclick="triggerLTForecast()">
+        <span>🔮</span>
+        <span>Generate Long-Term AI Forecast</span>
+    </button>
+
+    <!-- Loading State -->
+    <div class="lt-loading" id="ltLoading">
+        <div class="lt-loading-spinner"></div>
+        <span class="lt-loading-text" id="ltLoadingText">Fetching 2-year weekly data...</span>
+        <span class="lt-loading-step" id="ltLoadingStep">STEP 1/3</span>
+    </div>
+</div>
+
+<!-- Forecast Result Card -->
+<div class="lt-forecast-card" id="ltForecastCard">
+
+    <!-- Header -->
+    <div class="lt-header">
+        <div class="lt-title">
+            <span>🔮</span>
+            <span>Long-Term AI Forecast</span>
+        </div>
+        <span class="lt-bias-badge lt-bias-neutral" id="ltBiasBadge">--</span>
+    </div>
+
+    <!-- Symbol + timeframe subtitle -->
+    <div class="lt-subtitle" id="ltSubtitle">Weekly data · 2Y history · Claude AI</div>
+
+    <!-- Investment Thesis -->
+    <div class="lt-thesis" id="ltThesis">Analyzing...</div>
+
+    <!-- 3 Price Targets -->
+    <div class="lt-targets-grid">
+        <div class="lt-target">
+            <div class="lt-target-label">6M Target</div>
+            <div class="lt-target-price" id="ltTarget6m">--</div>
+            <div class="lt-target-pct" id="ltPct6m">--</div>
+        </div>
+        <div class="lt-target lt-target-main">
+            <div class="lt-target-label">12M Target</div>
+            <div class="lt-target-price" id="ltTarget12m">--</div>
+            <div class="lt-target-pct" id="ltPct12m">--</div>
+        </div>
+        <div class="lt-target">
+            <div class="lt-target-label">24M Target</div>
+            <div class="lt-target-price" id="ltTarget24m">--</div>
+            <div class="lt-target-pct" id="ltPct24m">--</div>
+        </div>
+    </div>
+
+    <!-- Key Metrics Bar -->
+    <div class="lt-metrics-row">
+        <div class="lt-metric">
+            <div class="lt-metric-label">52W Position</div>
+            <div class="lt-metric-bar-wrap">
+                <div class="lt-metric-bar" id="ltPos52Bar" style="width:0%"></div>
+            </div>
+            <div class="lt-metric-value" id="ltPos52Val">--</div>
+        </div>
+        <div class="lt-metric">
+            <div class="lt-metric-label">EMA Cross</div>
+            <div class="lt-metric-value" id="ltCrossVal">--</div>
+        </div>
+        <div class="lt-metric">
+            <div class="lt-metric-label">Signal Quality</div>
+            <div class="lt-metric-value" id="ltQualityVal">--</div>
+        </div>
+    </div>
+
+    <!-- Entry Zone + Stop Loss -->
+    <div class="lt-zones-row">
+        <div class="lt-zone-box lt-zone-entry">
+            <span class="lt-zone-label">🎯 Entry Zone</span>
+            <span class="lt-zone-val" id="ltEntryZoneVal">--</span>
+        </div>
+        <div class="lt-zone-box lt-zone-sl">
+            <span class="lt-zone-label">🛑 LT Stop Loss</span>
+            <span class="lt-zone-val" id="ltSlVal">--</span>
+        </div>
+    </div>
+
+    <!-- Risk + Catalyst -->
+    <div class="lt-intel-row">
+        <div class="lt-intel-box lt-risk-box">
+            <span class="lt-intel-icon">⚠️</span>
+            <span class="lt-intel-label">Key Risk</span>
+            <span id="ltRiskText">--</span>
+        </div>
+        <div class="lt-intel-box lt-catalyst-box">
+            <span class="lt-intel-icon">🚀</span>
+            <span class="lt-intel-label">Key Catalyst</span>
+            <span id="ltCatalystText">--</span>
+        </div>
+    </div>
+
+    <!-- AI Narrative -->
+    <div class="lt-narrative" id="ltNarrative">--</div>
+
+    <!-- AI Confidence -->
+    <div class="lt-conf-row">
+        <span class="lt-conf-label">AI Confidence</span>
+        <div class="lt-conf-bar-wrap">
+            <div class="lt-conf-bar" id="ltConfBar" style="width:0%"></div>
+        </div>
+        <span class="lt-conf-val" id="ltConfVal">--</span>
+    </div>
+
+    <!-- Timeframe Quality -->
+    <div class="lt-quality-row">
+        <span class="lt-quality-label">Data Quality</span>
+        <span class="lt-quality-badge lt-quality-moderate" id="ltQualityBadge">Moderate</span>
+    </div>
+
+    <!-- Disclaimer -->
+    <div class="lt-disclaimer">⚠️ Based on technical data only. Not financial advice. Past performance ≠ future results. Always DYOR before investing.</div>
+
+</div>
+
+
+
+                <!-- ====== END LT MODULE ====== -->
+
             </div>
 
             <!-- Portfolio -->
@@ -4178,6 +4563,382 @@
             // Initial Kickoff
             setTimeout(scanMarketLeaders, 1000);
             setInterval(scanMarketLeaders, 15000); // Efficient 15s market-wide refresh
+
+            // ====== LONG-TERM AI FORECAST MODULE — JS ======
+
+// ──────────────────────────────────────────────────────────────────
+// LT MODULE — Helper to format ₹ prices
+// ──────────────────────────────────────────────────────────────────
+function ltFmt(n) {
+    if (n === null || n === undefined || isNaN(n)) return '--';
+    if (n >= 1000) return '₹' + n.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    return '₹' + n.toFixed(2);
+}
+function ltPctColor(pct) {
+    if (pct > 0) return 'var(--green)';
+    if (pct < 0) return 'var(--red)';
+    return 'var(--amber)';
+}
+
+// ──────────────────────────────────────────────────────────────────
+// LT MODULE — Fetch weekly OHLCV data (2 years)
+// ──────────────────────────────────────────────────────────────────
+async function fetchWeeklyData(symbol) {
+    const sym = symbol.endsWith('.NS') ? symbol : symbol + '.NS';
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1wk&range=2y`;
+
+    const proxies = [
+        `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
+        `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
+        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+        `https://corsproxy.org/?url=${encodeURIComponent(url)}`,
+        url
+    ];
+
+    for (const proxy of proxies) {
+        try {
+            const res = await fetch(proxy, { signal: AbortSignal.timeout(8000) });
+            if (!res.ok) continue;
+            const json = await res.json();
+            let data = null;
+            if (json.contents) {
+                try { data = JSON.parse(json.contents); } catch (e) { continue; }
+            } else if (json.chart) {
+                data = json;
+            }
+            if (data?.chart?.result?.[0]) return data;
+        } catch (e) { }
+    }
+    throw new Error('Unable to fetch weekly data. Check connection.');
+}
+
+// ──────────────────────────────────────────────────────────────────
+// LT MODULE — Extract & engineer long-term features from weekly data
+// ──────────────────────────────────────────────────────────────────
+function buildLTFeatures(result) {
+    const q = result.indicators.quote[0];
+    const closes = [], highs = [], lows = [], vols = [];
+
+    for (let i = 0; i < result.timestamp.length; i++) {
+        if (q.close[i] != null && q.close[i] > 0) {
+            closes.push(q.close[i]);
+            highs.push(q.high[i] || q.close[i]);
+            lows.push(q.low[i] || q.close[i]);
+            vols.push(q.volume[i] || 0);
+        }
+    }
+
+    if (closes.length < 26) throw new Error('Insufficient weekly data (need 26+ weeks).');
+
+    const n = closes.length;
+    const ltp = closes[n - 1];
+
+    // ── EMAs (reuse existing calcEMA from the main script) ──
+    const ema50 = calcEMA(closes, Math.min(50, n - 1));
+    const ema200 = calcEMA(closes, Math.min(200, n - 1));
+
+    // ── RSI (14-week) ──
+    const rsiArr = calcRSI(closes, 14);
+    const weeklyRsi = rsiArr[n - 1];
+
+    // ── MACD (12,26,9) ──
+    const { macd: macdLine, signal: macdSig, histogram: macdHist } = calcMACD(closes, 12, 26, 9);
+    const macdAbove = macdLine[n - 1] !== null && macdSig[n - 1] !== null && macdLine[n - 1] > macdSig[n - 1];
+    const macdHistVal = macdHist[n - 1];
+
+    // ── 52-Week High / Low & Range Position ──
+    const wSlice = Math.min(52, n);
+    const high52 = Math.max(...highs.slice(-wSlice));
+    const low52 = Math.min(...lows.slice(-wSlice));
+    const pos52 = high52 !== low52 ? ((ltp - low52) / (high52 - low52)) * 100 : 50;
+
+    // ── Price momentum (slope over 6M & 12M) ──
+    const slope6m = n >= 26 ? ((closes[n - 1] - closes[n - 26]) / closes[n - 26]) * 100 : null;
+    const slope12m = n >= 52 ? ((closes[n - 1] - closes[n - 52]) / closes[n - 52]) * 100 : null;
+
+    // ── Volume trend ──
+    const recentVol4 = vols.slice(-4).reduce((a, b) => a + b, 0) / 4;
+    const prevVol8 = vols.slice(-12, -4).reduce((a, b) => a + b, 0) / 8;
+    const volTrend = recentVol4 > prevVol8 * 1.2 ? 'INCREASING' :
+        recentVol4 < prevVol8 * 0.8 ? 'DECREASING' : 'STABLE';
+
+    // ── Golden/Death Cross ──
+    const goldenCross = ema50[n - 1] !== null && ema200[n - 1] !== null && ema50[n - 1] > ema200[n - 1];
+    const crossLabel = goldenCross ? '✅ Golden' : '❌ Death';
+    const crossDesc = goldenCross ? 'EMA50 > EMA200 (Bullish)' : 'EMA50 < EMA200 (Bearish)';
+
+    // ── ATR% weekly (volatility) ──
+    const atrArr = calcATR(highs, lows, closes, 14);
+    const atrPct = atrArr[n - 1] !== null ? (atrArr[n - 1] / ltp) * 100 : 3;
+
+    // ── Consecutive up/down weeks ──
+    let consecUp = 0, consecDown = 0;
+    for (let i = n - 1; i > Math.max(0, n - 9); i--) {
+        if (closes[i] > closes[i - 1]) consecUp++;
+        else break;
+    }
+    for (let i = n - 1; i > Math.max(0, n - 9); i--) {
+        if (closes[i] < closes[i - 1]) consecDown++;
+        else break;
+    }
+
+    // ── EMA distance (price vs key EMAs) ──
+    const distEma50 = ema50[n - 1] ? ((ltp - ema50[n - 1]) / ema50[n - 1]) * 100 : null;
+    const distEma200 = ema200[n - 1] ? ((ltp - ema200[n - 1]) / ema200[n - 1]) * 100 : null;
+
+    // ── Data quality ──
+    const quality = n >= 90 ? 'STRONG' : n >= 52 ? 'MODERATE' : 'WEAK';
+    const weeksAvail = n;
+
+    return {
+        ltp, closes, highs, lows, vols,
+        ema50: ema50[n - 1], ema200: ema200[n - 1],
+        weeklyRsi, macdAbove, macdHistVal,
+        high52, low52, pos52,
+        slope6m, slope12m,
+        volTrend, goldenCross, crossLabel, crossDesc,
+        atrPct, consecUp, consecDown,
+        distEma50, distEma200,
+        quality, weeksAvail
+    };
+}
+
+// ──────────────────────────────────────────────────────────────────
+// LT MODULE — Call Claude Sonnet for AI forecast narrative
+// ──────────────────────────────────────────────────────────────────
+async function callClaudeForLTForecast(symbol, f) {
+    const prompt = `You are a senior equity analyst specializing in Indian NSE-listed stocks for long-term investment (6 to 24 month horizon). Analyze this technical data and provide a structured investment forecast.
+
+Stock: ${symbol}
+Current Price: ₹${f.ltp.toFixed(2)}
+
+WEEKLY TIMEFRAME DATA (${f.weeksAvail} weeks of history):
+• 52-Week Range: ₹${f.low52.toFixed(2)} to ₹${f.high52.toFixed(2)}
+• Current 52W Position: ${f.pos52.toFixed(1)}% (0% = near 52W Low, 100% = near 52W High)
+• 6-Month Price Change: ${f.slope6m !== null ? f.slope6m.toFixed(2) + '%' : 'N/A'}
+• 12-Month Price Change: ${f.slope12m !== null ? f.slope12m.toFixed(2) + '%' : 'N/A'}
+• Weekly RSI(14): ${f.weeklyRsi !== null ? f.weeklyRsi.toFixed(1) : 'N/A'}
+• EMA50 vs EMA200: ${f.goldenCross ? 'GOLDEN CROSS — EMA50 above EMA200 (Bullish long-term trend)' : 'DEATH CROSS — EMA50 below EMA200 (Bearish long-term trend)'}
+• Distance from EMA50: ${f.distEma50 !== null ? (f.distEma50 > 0 ? '+' : '') + f.distEma50.toFixed(1) + '%' : 'N/A'}
+• Distance from EMA200: ${f.distEma200 !== null ? (f.distEma200 > 0 ? '+' : '') + f.distEma200.toFixed(1) + '%' : 'N/A'}
+• Weekly MACD Signal: ${f.macdAbove ? 'MACD above signal line (Bullish momentum)' : 'MACD below signal line (Bearish momentum)'}
+• Volume Trend: ${f.volTrend}
+• Weekly ATR%: ${f.atrPct.toFixed(2)}% (weekly volatility as % of price)
+• Consecutive up-weeks: ${f.consecUp}
+• Consecutive down-weeks: ${f.consecDown}
+
+Using this technical data, generate a long-term investment forecast for an Indian retail investor.
+
+RESPOND ONLY WITH THIS EXACT JSON (no markdown, no backticks, no extra text):
+{
+  "bias": "BULLISH or BEARISH or NEUTRAL",
+  "thesis": "One-line investment thesis, max 12 words",
+  "target_6m": <number, realistic price target 6 months from now>,
+  "target_12m": <number, realistic price target 12 months from now>,
+  "target_24m": <number, realistic price target 24 months from now>,
+  "stop_loss": <number, key long-term support / stop level>,
+  "entry_zone_low": <number, lower bound of ideal entry zone>,
+  "entry_zone_high": <number, upper bound of ideal entry zone>,
+  "key_risk": "Primary risk factor, max 18 words",
+  "key_catalyst": "Primary bullish catalyst, max 18 words",
+  "narrative": "2-3 sentences of clear investment rationale based strictly on the technical data given",
+  "confidence": <integer 0-100>,
+  "timeframe_quality": "STRONG or MODERATE or WEAK"
+}`;
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 900,
+            messages: [{ role: 'user', content: prompt }]
+        })
+    });
+
+    if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(`Claude API error: ${res.status} — ${errData.error?.message || 'Unknown'}`);
+    }
+
+    const data = await res.json();
+    const raw = data.content[0].text.replace(/```json|```/g, '').trim();
+    return JSON.parse(raw);
+}
+
+// ──────────────────────────────────────────────────────────────────
+// LT MODULE — Render forecast result into the UI
+// ──────────────────────────────────────────────────────────────────
+function renderLTForecast(f, ai, symbol) {
+    const card = document.getElementById('ltForecastCard');
+    const ltp = f.ltp;
+
+    // Subtitle
+    document.getElementById('ltSubtitle').innerText =
+        `${symbol} · Weekly Data · ${f.weeksAvail}W History · Claude AI`;
+
+    // Bias Badge
+    const biasBadge = document.getElementById('ltBiasBadge');
+    biasBadge.innerText = ai.bias;
+    biasBadge.className = 'lt-bias-badge ' + (
+        ai.bias === 'BULLISH' ? 'lt-bias-bullish' :
+        ai.bias === 'BEARISH' ? 'lt-bias-bearish' : 'lt-bias-neutral'
+    );
+
+    // Thesis
+    document.getElementById('ltThesis').innerText = `"${ai.thesis}"`;
+
+    // Targets
+    function renderTarget(priceId, pctId, targetPrice) {
+        const pct = ((targetPrice - ltp) / ltp) * 100;
+        const priceEl = document.getElementById(priceId);
+        const pctEl = document.getElementById(pctId);
+        priceEl.innerText = ltFmt(targetPrice);
+        pctEl.innerText = (pct >= 0 ? '+' : '') + pct.toFixed(1) + '%';
+        pctEl.style.color = ltPctColor(pct);
+    }
+    renderTarget('ltTarget6m', 'ltPct6m', ai.target_6m);
+    renderTarget('ltTarget12m', 'ltPct12m', ai.target_12m);
+    renderTarget('ltTarget24m', 'ltPct24m', ai.target_24m);
+
+    // 52W Position bar
+    const pos52 = Math.max(0, Math.min(100, f.pos52));
+    const posBar = document.getElementById('ltPos52Bar');
+    setTimeout(() => { posBar.style.width = pos52 + '%'; }, 100);
+    posBar.style.background = pos52 > 70 ? 'var(--red)' : pos52 > 40 ? 'var(--green)' : 'var(--amber)';
+    document.getElementById('ltPos52Val').innerText = pos52.toFixed(0) + '%';
+    document.getElementById('ltPos52Val').style.color =
+        pos52 > 70 ? 'var(--red)' : pos52 < 30 ? 'var(--green)' : 'var(--amber)';
+
+    // EMA Cross
+    const crossEl = document.getElementById('ltCrossVal');
+    crossEl.innerText = f.crossLabel;
+    crossEl.style.color = f.goldenCross ? 'var(--green)' : 'var(--red)';
+
+    // Signal Quality
+    const qualEl = document.getElementById('ltQualityVal');
+    qualEl.innerText = ai.timeframe_quality;
+    qualEl.style.color =
+        ai.timeframe_quality === 'STRONG' ? 'var(--green)' :
+        ai.timeframe_quality === 'WEAK' ? 'var(--red)' : 'var(--amber)';
+
+    // Entry Zone & Stop Loss
+    document.getElementById('ltEntryZoneVal').innerText =
+        `${ltFmt(ai.entry_zone_low)} – ${ltFmt(ai.entry_zone_high)}`;
+    document.getElementById('ltSlVal').innerText = ltFmt(ai.stop_loss);
+
+    // Risk & Catalyst
+    document.getElementById('ltRiskText').innerText = ai.key_risk;
+    document.getElementById('ltCatalystText').innerText = ai.key_catalyst;
+
+    // Narrative
+    document.getElementById('ltNarrative').innerText = ai.narrative;
+
+    // Confidence Bar
+    const conf = Math.max(0, Math.min(100, ai.confidence));
+    setTimeout(() => {
+        document.getElementById('ltConfBar').style.width = conf + '%';
+    }, 200);
+    document.getElementById('ltConfVal').innerText = conf + '%';
+
+    // Data Quality Badge
+    const qBadge = document.getElementById('ltQualityBadge');
+    qBadge.innerText = ai.timeframe_quality;
+    qBadge.className = 'lt-quality-badge lt-quality-' + ai.timeframe_quality.toLowerCase();
+
+    // Show the card
+    card.style.display = 'block';
+    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ──────────────────────────────────────────────────────────────────
+// LT MODULE — Main orchestrator (called by trigger button)
+// ──────────────────────────────────────────────────────────────────
+async function triggerLTForecast() {
+    // Guard: need an active symbol
+    if (!activeSymbol) {
+        flashError('Scan a stock first before generating a long-term forecast.');
+        return;
+    }
+
+    const btn = document.getElementById('ltTriggerBtn');
+    const loading = document.getElementById('ltLoading');
+    const loadText = document.getElementById('ltLoadingText');
+    const loadStep = document.getElementById('ltLoadingStep');
+    const card = document.getElementById('ltForecastCard');
+
+    // Reset UI
+    btn.style.display = 'none';
+    card.style.display = 'none';
+    loading.style.display = 'flex';
+
+    const sym = activeSymbol.replace('.NS', '');
+
+    try {
+        // STEP 1: Fetch weekly data
+        loadText.innerText = `Fetching 2-year weekly data for ${sym}...`;
+        loadStep.innerText = 'STEP 1/3 — DATA FETCH';
+        const rawData = await fetchWeeklyData(sym);
+        const result = rawData.chart.result[0];
+
+        // STEP 2: Build features
+        loadText.innerText = 'Computing long-term technical indicators...';
+        loadStep.innerText = 'STEP 2/3 — ANALYSIS';
+        const features = buildLTFeatures(result);
+
+        // STEP 3: AI forecast
+        loadText.innerText = 'Claude AI generating investment forecast...';
+        loadStep.innerText = 'STEP 3/3 — AI FORECAST';
+        const aiForecast = await callClaudeForLTForecast(sym, features);
+
+        // Render
+        loading.style.display = 'none';
+        renderLTForecast(features, aiForecast, sym);
+
+        // Hide trigger button so it's not cluttering (add a "Refresh" below card if needed)
+    } catch (err) {
+        loading.style.display = 'none';
+        btn.style.display = 'flex';
+        btn.innerHTML = '<span>⚠️</span><span>Retry Long-Term Forecast</span>';
+
+        // Show inline error in card area
+        card.style.display = 'block';
+        card.innerHTML = `
+            <div class="lt-error">
+                <span class="lt-error-icon">⚠️</span>
+                <strong>Forecast Failed</strong><br>
+                <span style="color:var(--text-dim);font-size:11px;font-weight:400;">${err.message}</span>
+            </div>`;
+    }
+}
+
+// ──────────────────────────────────────────────────────────────────
+// LT MODULE — Show the trigger button after a successful intraday scan
+// Hooks into existing renderMainCard() by watching DOM changes
+// ──────────────────────────────────────────────────────────────────
+(function patchRenderForLT() {
+    const origRender = window.renderMainCard;
+    if (typeof origRender === 'function') {
+        window.renderMainCard = function (obj, isSilent) {
+            origRender.call(this, obj, isSilent);
+
+            // Show trigger, hide old card
+            const wrap = document.getElementById('ltTriggerWrap');
+            const card = document.getElementById('ltForecastCard');
+            const btn = document.getElementById('ltTriggerBtn');
+            const loading = document.getElementById('ltLoading');
+
+            if (wrap) {
+                wrap.style.display = 'block';
+                card.style.display = 'none';
+                loading.style.display = 'none';
+                btn.style.display = 'flex';
+                btn.innerHTML = '<span>🔮</span><span>Generate Long-Term AI Forecast</span>';
+            }
+        };
+    }
+})();
+
 
         </script>
 </body>
